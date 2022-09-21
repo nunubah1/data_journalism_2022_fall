@@ -33,6 +33,8 @@ install.packages("tidyverse")
 library(tidyverse)
 ```
 
+### Interesting Packages
+The package lubridate makes it easier to handle time-related functions.
 
 ### Summarizing
 
