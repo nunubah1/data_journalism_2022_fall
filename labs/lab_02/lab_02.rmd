@@ -1,0 +1,111 @@
+---
+title: "lab_02"
+author: "derek willis"
+date: "8/09/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+library(lubridate)
+```
+
+## Load Data
+
+Let's keep working with the slice of WinRed contribution data from West Virginia.  
+
+```{r}
+wv_winred_contribs <- read_rds("data/lab_02.rds")
+```
+
+## Examine Data
+
+## Answer questions
+
+**Q1** Create a new column that divides the contribution amounts into the following options - less than $10, $10-$25, $26-$50, $51_$100, $101-$500, $501 and up - and calculates how many contributions are in each group. How would you describe the distribution of contributions in a sentence?
+A1. From a quick glance, it would seem that most of the contributions are less than $10. Most people that contribute money, donate $25 or less.
+
+```{r}
+wv_winred_categories <- wv_winred_contribs %>%
+  mutate(
+    amount_category = case_when(
+        amount < 10 ~ "Less than $10",
+        amount >= 10 & amount <= 25 ~ "Between $10 and $25",
+        amount > 26 & amount <= 50 ~ "Between $26 and $50",
+        amount > 51 & amount <= 100 ~ "Between $51 and $100",
+        amount > 101 & amount <= 500 ~ "Between $101 and $500",
+        amount > 501 ~ "More than $501"
+      )
+  )
+head(wv_winred_categories)
+```
+```{r}
+wv_winred_categories %>% 
+  group_by(amount_category) %>% 
+  summarize(total_amount = sum(amount)) %>% 
+  arrange(desc(total_amount))
+```
+
+
+Q2. Which West Virginia donors made the most contributions of less than $10? You'll need to use a combination of columns to get unique donors.  
+A2. Franco Colonna made the most contributions of less than $10. 
+```{r}
+standardized_wv_winred <- wv_winred_categories %>%
+  mutate(
+    last_name = str_to_title(last_name)
+)
+```
+
+```{r}
+standardized_wv_winred <- standardized_wv_winred %>% 
+  mutate(
+    first_name = str_to_title(first_name)
+  )
+```
+
+```{r}
+less_than_10 <- standardized_wv_winred %>% 
+  filter(amount_category == "Less than $10")
+```
+
+```{r}
+less_than_10 %>% 
+  group_by(first_name, last_name) %>% 
+  summarize(total = sum(amount),count_contribs = n()) %>% 
+  arrange(desc(total))
+```
+
+
+Q3. What questions do the results of Q2 raise in your mind? How could you use the data to explore them? No code here, just your questions.
+A3. Why would a supporter like Franco Colonna donate less than $10 183 times? People don't automate their donations like how like how they would a cell phone or tv bill. But the number of times they contribute, makes it seem so. What drives supporters to contribute few amounts so many times? Could these donations somehow be automated sort of like in a laundering way? Like Rev. Dr. John donated less than $10 over 293 times. That's so many times. Why don't they just donate $700 one time? I know its fiction but I saw an episode of Breaking Bad where Walter White was donating to himself for his cancer treatment using so many different aliases so that it could seem to his son that his "gofundme" like page was helping him out.
+
+Q4. Which month saw the most contributions?
+A4. April
+
+```{r}
+wv_winred_contribs %>%
+  mutate(month = floor_date(date, "month")) %>%
+  group_by(month) %>%
+  summarise(total_amount = sum(amount),count_contribs = n()) %>%
+  arrange(desc(total_amount))
+```
+
+Q5. How many contributions of $2,900 - the individual maximum donation - were there, and who did they go to? How many of the recipients are from West Virginia? Do some googling to find out.
+A5. 6 contributions. They went to Carol Miller, Steven Palazzo, Ryan Zinke and David McKinley. Carol Miller and David McKinley are from West Virginia.
+
+```{r}
+twentynine <- wv_winred_contribs %>% 
+  filter(amount == 2900) %>% 
+  select(memo_text,date,amount, aggregate_amount,first_name,last_name)
+head(twentynine)
+```
