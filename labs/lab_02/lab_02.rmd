@@ -33,7 +33,7 @@ wv_winred_contribs <- read_rds("data/lab_02.rds")
 ## Answer questions
 
 **Q1** Create a new column that divides the contribution amounts into the following options - less than $10, $10-$25, $26-$50, $51_$100, $101-$500, $501 and up - and calculates how many contributions are in each group. How would you describe the distribution of contributions in a sentence?
-A1. From a quick glance, it would seem that most of the contributions are less than $10. Most people that contribute money, donate $25 or less.
+A1. Most of the money donated are between $26 and $50 and then between $10 and $25. Before reaching less than $10, larger amount are donated, more than $501 and between $51 and $100 and between $101 and $500. 
 
 ```{r}
 wv_winred_categories <- wv_winred_contribs %>%
