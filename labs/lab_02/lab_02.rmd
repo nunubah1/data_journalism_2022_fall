@@ -58,7 +58,7 @@ wv_winred_categories %>%
 
 
 Q2. Which West Virginia donors made the most contributions of less than $10? You'll need to use a combination of columns to get unique donors.  
-A2. Franco Colonna made the most contributions of less than $10. 
+A2. Franco Colonna made the most total amount contributions of less than $10. 
 ```{r}
 standardized_wv_winred <- wv_winred_categories %>%
   mutate(
@@ -87,7 +87,7 @@ less_than_10 %>%
 
 
 Q3. What questions do the results of Q2 raise in your mind? How could you use the data to explore them? No code here, just your questions.
-A3. Why would a supporter like Franco Colonna donate less than $10 183 times? People don't automate their donations like how like how they would a cell phone or tv bill. But the number of times they contribute, makes it seem so. What drives supporters to contribute few amounts so many times? Could these donations somehow be automated sort of like in a laundering way? Like Rev. Dr. John donated less than $10 over 293 times. That's so many times. Why don't they just donate $700 one time? I know its fiction but I saw an episode of Breaking Bad where Walter White was donating to himself for his cancer treatment using so many different aliases so that it could seem to his son that his "gofundme" like page was helping him out.
+A3. Why would a supporter like Franco Colonna donate less than $10 183 times? People don't automate their donations like how like how they would a cell phone or tv bill. But the number of times they contribute, makes it seem so. What drives supporters to contribute few amounts so many times? Could these donations somehow be automated sort of like in a laundering way? Like Rev. Dr. John donated less than $10 over 293 times in 3-month period. That's so many times. Why don't they just donate $700 one time? I know its fiction but I saw an episode of Breaking Bad where Walter White was donating to himself for his cancer treatment using so many different aliases so that it could seem to his son that his "gofundme" like page was helping him out.
 
 Q4. Which month saw the most contributions?
 A4. April
