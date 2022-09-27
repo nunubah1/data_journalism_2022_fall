@@ -164,7 +164,7 @@ library(janitor)
 
 ### Task 3: Load Arnold, Maryland demonstration data
 **Task** Run the following codeblock to load a demonstration slice of the WinRed contribution data from Conowingo, Maryland. How many rows are in this demonstration data set?
-**Answer**
+**Answer** 14
 
 ```{r}
 conowingo <- read_rds("data/conowingo.rds")
