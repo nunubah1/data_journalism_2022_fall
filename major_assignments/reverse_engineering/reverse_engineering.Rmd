@@ -61,8 +61,7 @@ In this notebook, we are reverse engineering five sentences from the story.
 ### Sentence 1
 
 * **Sentence text**: Finding all of Moore's contributions that are less than $100 and seeing the top donors of $100 and less.
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
-
+* **Analysis summary**: Wes Moore had 8,647 unique individuals donate less than $100. One of the individuals donated less than $100 82 times. Her name is Delores Parron-Ragland. She was a distinguished social worker who's career spans in the federal government, academia, and clinical practice. She's an outlier however. The top doners 28 to 44 contributions of less than $100 however. 
 ```{r}
 # Put code to reverse engineer sentence here
 less_than_hundred_moore_contribs <- moore_contributions %>% 
