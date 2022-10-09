@@ -1,6 +1,6 @@
 ---
-title: "Reverse Engineering Project"
-author: "Student names here"
+title: "Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates"
+author: "Stephen Neukam"
 date: "Date here"
 output:
   html_document:
@@ -25,6 +25,11 @@ In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
 Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
+# turn off sci notation
+options(scipen=999)
+library(tidyverse)
+library(lubridate)
+library(janitor)
 
 ```
 
@@ -35,9 +40,17 @@ In this section, describe the source of the data, write a basic data dictionary 
 ```{r}
 # Load required data
 
+moore_contributions <- read_csv("data/moore_contributions.csv")
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
+glimpse(moore_contributions)
 
+moore_contributions <- moore_contributions %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date))
+glimpse(moore_contributions)
 # Clean required data and prepare for analysis if needed. 
+
+
 
 
 ```
@@ -47,12 +60,22 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: [Paste in sentence to engineer here]
+* **Sentence text**: Finding all of Moore's contributions that are less than $100 and seeing the top donors of $100 and less.
 * **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
 # Put code to reverse engineer sentence here
+less_than_hundred_moore_contribs <- moore_contributions %>% 
+  filter(contribution_amount < 100)
+```
 
+```{r}  
+less_than_hundred_moore_contribs <- less_than_hundred_moore_contribs %>%
+  group_by(contributor_name) %>% 
+  summarise(total = n(), amount = sum(contribution_amount)) %>% 
+  arrange(desc(total))
+less_than_hundred_moore_contribs
+  
 # Display results of code below this codeblock
 
 ```
