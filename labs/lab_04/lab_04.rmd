@@ -93,6 +93,10 @@ moore_miller_votes <- primary_with_voting_locations %>%
   filter(str_detect(candidate_name, "^Wes Moore and Aruna Miller"))
 moore_miller_votes
 ```
+```{r}
+county_most_voting_locations <- moore_miller_votes %>% 
+  select(county_name, precinct_code, location_name)
+```
 
 ```{r}
 top_moore_miller_votes <- moore_miller_votes %>% 
