@@ -86,7 +86,7 @@ Q1. Using the newly-created dataframe and isolating just the results for Wes Moo
 
 Does the county with the most voting locations have the largest population in the state (ask yourself: where have you seen county population figures recently)?
 
-A1. Prince George's County has the largest population in the state. Montgomery county is the largest county  in Maryland in population size. 
+A1. Prince George's County has the most voting locations in the state but Montgomery county has largest population in Maryland. 
 
 ```{r}
 moore_miller_votes <- primary_with_voting_locations %>% 
@@ -94,30 +94,24 @@ moore_miller_votes <- primary_with_voting_locations %>%
 moore_miller_votes
 ```
 ```{r}
-county_most_voting_locations <- moore_miller_votes %>% 
-  select(county_name, precinct_code, location_name, location_address, city)
-```
-
-```{r}
-county_most_voting_locations <- county_most_voting_locations%>% 
+most_voting_locations <- moore_miller_votes %>% 
   group_by(county_name) %>% 
-  summarize(count = n()) %>% 
-  arrange(desc(count))
-
-county_most_voting_locations
+  summarize(number_of_voting_locations = n_distinct(location_name)) %>% 
+  arrange(desc(number_of_voting_locations))
+most_voting_locations
 ````
 
 
 Q2. Write code to produce a `votes` column which is the result of adding together `early_votes`, `election_night_votes`, `provisional_votes` and the mail-in votes, overwriting your dataframe so that it now has that `total_votes` column going forward. Then, separately write code to show each county and precinct and calculate the total votes in the Governor's race - bearing in mind that each precinct will have multiple rows in the dataframe, but you only want to see one row for each precinct. What is the name and voting location of the precinct that saw the most votes in the governor's race? 
 
-A2. 
+A2. Easton Firehouse Bingo Hall in Talbot County.
 
 ```{r}
 total_votes_primary <- primary_with_voting_locations %>% 
-  select(county_name, precinct_code, county_code,location_name, location_address, city, office_name, early_votes, election_night_votes, provisional_votes, mail_in_ballot_1_votes, mail_in_ballot_2_votes)
+  select(county_name, precinct_code, county_code,location_name, location_address, city, candidate_name, office_name, early_votes, election_night_votes, provisional_votes, mail_in_ballot_1_votes, mail_in_ballot_2_votes)
 
 total_votes_primary <- total_votes_primary %>% 
-  mutate(votes = rowSums(total_votes_primary[,8:12]))
+  mutate(votes = rowSums(total_votes_primary[,9:13]))
 ```
 
 
@@ -127,42 +121,61 @@ governor_total_votes <- total_votes_primary %>%
 ````
 
 ```{r}
-governor_total_votes <- governor_total_votes %>% 
-  mutate(total_votes = sum(votes)) %>% 
-  arrange(desc(total_votes)) %>% 
-  select(county_name, total_votes)
+governor_total_votes <- governor_total_votes %>%
+  group_by(county_name, location_name, precinct_code) %>% 
+  summarize(total_votes = sum(votes)) %>% 
+  arrange(desc(total_votes))
+  
 governor_total_votes
 
 ```
 
 Q3. Let's look at the average number of votes in each party's primary race for governor. Take the code you wrote for the last part of Q2, save the results to a new variable and then find the precincts with 0 total votes for governor. How many precincts are there, and which county has the most? What else would you need to know about these precincts to know whether this might be worth a story?
 
+A3. 9 Precicnts. Whether or not these are voting locations that are no longer operating as voting locations. 
+
 ```{r}
-group_by(precinct_code) %>% 
-  summarise(total_votes = sum(votes)) %>% 
-  arrange(desc(total_votes))
-governor_total_votes
+zero_governor_votes <- governor_total_votes %>%
+  filter(total_votes == 0)
+  
+zero_governor_votes
+
 ```
 
 Finally, write code to calculate the average and median number of total votes across all precincts statewide (so you want to see just two numbers - the average and median). To do this, you will need to use the `ungroup()` function on your new dataframe _before_ you do the math - https://www.rdocumentation.org/packages/multiplyr/versions/0.1.1/topics/ungroup. There's no state column here, so you aren't grouping by anything, but can still use summarize to do the math.
 
 Take a look at the the Annotated Code of Maryland's election laws (https://mgaleg.maryland.gov/2023RS/Statute_Web/gel/gel.pdf) - can you find a limit on the number of voters assigned to a precinct? How might your answer impact wait times to vote?
 
-A3. 
+A3. The mean is 466.6 and the median is 418. I didn't see a limit. But the most I seen was over 8,000. The wait time is long and plays a factor in people choosing not to vote. 
 
 ```{r}
-mean_median_votes <- total_votes_primary %>% 
+mean_median_governor_votes<- governor_total_votes %>% 
   ungroup() %>% 
-  summarize(
-            votes = votes
-            mean_votes = mean(votes)
-            median_votes = median(votes)) %>% 
-  select(county_name, mean_votes, median_votes) %>% 
-  arrange(desc(votes))
+  summarize(mean = mean(total_votes), median = median(total_votes))
+mean_median_governor_votes
+  
+
 ```
+
+
 
 Q4. Choose your own adventure: I want you to come up with a question you could ask of one of the dataframes we've created for this lab. It could involve candidates, or counties or types of voting, but it cannot be a variation of a previous question (so, for example, you can't ask, "What's the average number of votes per precinct in the U.S. Senate primary?"). First write the question and then try to answer it by writing code. If you're not sure of the exact code, try googling (or ask me or Ramsay for advice) but, at a minimum, describe what you think you'd have to do to answer it and what the results would look like. That can help.
 A4: Put your question here.
 
+Which nominee scored the most votes by Bowie residents and which office did he run for?
+
+Aisha Braveboy. She's been the state's attorney since 2019
+
+
 ```{r}
+bowie_votes <- total_votes_primary %>%  
+  filter(str_detect(city, "BOWIE"))
+```
+
+```{r}
+bowie_votes <- bowie_votes %>%
+  group_by(candidate_name, office_name) %>% 
+  summarise(total_votes = sum(votes)) %>% 
+  arrange(desc(total_votes))
+bowie_votes
 ```
