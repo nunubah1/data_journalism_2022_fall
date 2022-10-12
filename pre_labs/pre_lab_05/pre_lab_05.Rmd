@@ -39,6 +39,7 @@ library(refinr)
 ```{r}
 # Load data
 dc_food <- read_csv("data/dc_food.csv")
+cleaned_dc_food <- read.csv("data/cleaned_dc_food.csv")
 
 # Display it
 dc_food
