@@ -57,8 +57,6 @@ md_expenses <- md_expenses %>%
   clean_names() %>% 
   mutate(expenditure_date = as.Date(expenditure_date)) %>% 
   select(-x14)
-
-glimpse(md_expenses)
 ```
 
 ## Answer questions
@@ -68,6 +66,10 @@ glimpse(md_expenses)
 ```{r}
 media_md_expenses <- md_expenses %>% 
   filter(str_detect(expense_category, "Media"))
+```
+
+```{r}
+write_csv(media_md_expenses, "data/media_md_expenses.csv")
 ```
 
 Using OpenRefine, create a project using that CSV file, create a copy of the `payee_name` column called `payee_clean` and then standardize it, focusing on the payees that appear most often. Pay particular attention to variations of Facebook, bearing in mind that it changed its name last year: https://about.fb.com/news/2021/10/facebook-company-is-now-meta/), but also clean up variations of the most common payees.

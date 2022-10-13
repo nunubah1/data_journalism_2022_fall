@@ -60,7 +60,8 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: Finding all of Moore's contributions that are less than $100 and seeing the top donors of $100 and less.
+* **Sentence text**: “We set the pace in fundraising — including raising more money in Maryland and having 73% of donations $100 or less — because this campaign has inspired thousands of people from all walks of life in Maryland and across the country who see the opportunity to make Wes Moore governor of Maryland and change the trajectories of families who have been left behind,” the campaign said in a statement."
+
 * **Analysis summary**: Wes Moore had 8,647 unique individuals donate less than $100. One of the individuals donated less than $100 82 times. Her name is Delores Parron-Ragland. She was a distinguished social worker who's career spans in the federal government, academia, and clinical practice. She's an outlier however. The top doners 28 to 44 contributions of less than $100 however. 
 ```{r}
 # Put code to reverse engineer sentence here
@@ -81,11 +82,14 @@ less_than_hundred_moore_contribs
 
 ### Sentence 2
 
-* **Sentence text**: [Paste in sentence to engineer here]
+* **Sentence text**: “Moore, a U.S. Army veteran and bestselling author, built a campaign war chest that included over $2.3 million in out-of-state contributions. Tom Perez, a former leader of the Democratic National Committee, raised nearly $1.7 million in donations from outside Maryland.” 
+
 * **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
-# Put code to reverse engineer sentence here
+# Put code to reverse engineer sentence here]
+out_of_state_moore_contribs <- moore_contributions %>% 
+  filter(!str_detect(contributor_address, "^Md"))
 
 # Display results of code below this codeblock
 
@@ -93,7 +97,8 @@ less_than_hundred_moore_contribs
 
 ### Sentence 3
 
-* **Sentence text**: [Paste in sentence to engineer here]
+* **Sentence text**: “The out-of-state fundraising has helped candidates like Moore and Perez make up ground on the financial edge held by Franchot, who still led all candidates with $3.3 million cash on hand at the end of 2021. Moore raised the most money in Maryland out of all the candidates, but also raised over $1.3 million between New York and California.”
+
 * **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
 
 ```{r}
