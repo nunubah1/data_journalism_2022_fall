@@ -1,0 +1,148 @@
+---
+title: "Chris Van Hollen"
+author: "Lisa Woelfl"
+date: "10/11/22"
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction 
+
+In this notebook, we are looking at FEC data concerning Chris Van Hollen's senator race campaign.
+
+## Load libraries
+
+Loading required libraries for this analysis.
+
+```{r echo=FALSE, message=FALSE}
+# Load the tidyverse here
+library(tidyverse)
+# Load janitor here
+library(janitor)
+library(lubridate)
+```
+
+## Load and Cleaning Data
+
+In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
+
+```{r}
+# Load required data
+# Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
+# Clean required data and prepare for analysis if needed. 
+receipts_hollen <- read_csv("data/receipts_schedule_2022.csv")
+disburs_hollen <- read_csv("data/disbursements_schedule_2022.csv")
+```
+
+## Sentences to Engineer
+In this notebook, we are reverse engineering five sentences from the story.
+
+### Question 1
+
+* **Question**: Where is Van Hollen's money coming from? Who is donating the most? Who are those people/organizations?
+
+* **Analysis summary**: 
+
+```{r}
+head(receipts_hollen)
+```
+
+```{r}
+total_donations_hollen <- receipts_hollen %>% 
+  group_by(contributor_name) %>% 
+  summarise(total = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(total))
+
+total_donations_hollen
+```
+
+```{r}
+totalsum_donations_hollen <- receipts_hollen %>%
+  group_by(report_year) %>% 
+  summarise(total = sum(contribution_receipt_amount))
+
+totalsum_donations_hollen
+```
+
+
+```{r}
+count_donations_hollen <- receipts_hollen %>% 
+  group_by(contributor_name) %>% 
+  summarise(count_donations = n()) %>% 
+  arrange(desc(count_donations))
+
+count_donations_hollen
+```
+
+```{r}
+receipts_hollen %>% 
+  filter(contributor_name == "PARRON-RAGLAND, DELORES L")
+```
+
+
+
+
+
+
+
+
+### Question 2
+
+* **Question**: Where is Van Hollen spending his money? How much? Where is most of his money going? Who are those people/organizations?
+
+```{r}
+totalsum_disburs_hollen <- disburs_hollen %>%
+  group_by(report_year) %>% 
+  summarise(total = sum(disbursement_amount))
+
+totalsum_disburs_hollen
+```
+
+```{r}
+count_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  summarise(count_disburs = n()) %>% 
+  arrange(desc(count_disburs))
+
+count_disburs_hollen
+```
+
+```{r}
+indi_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  filter(entity_type_desc == "INDIVIDUAL") %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+indi_disburs_hollen
+```
+Screen Strategies is a TV advertising company that specializes in developing TV advertising for Democratic candidates 
+
+```{r}
+total_disburs_hollen <- disburs_hollen %>% 
+  group_by(recipient_name) %>% 
+  summarise(total = sum(disbursement_amount)) %>% 
+  arrange(desc(total))
+
+total_disburs_hollen
+```
+
+
+
+
+
+
+
+
+
+
