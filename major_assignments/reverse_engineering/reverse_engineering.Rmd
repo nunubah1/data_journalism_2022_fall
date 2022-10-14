@@ -46,7 +46,8 @@ glimpse(moore_contributions)
 
 moore_contributions <- moore_contributions %>% 
   clean_names() %>% 
-  mutate(contribution_date = mdy(contribution_date))
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x13)
 glimpse(moore_contributions)
 # Clean required data and prepare for analysis if needed. 
 
@@ -88,13 +89,84 @@ less_than_hundred_moore_contribs
 
 ```{r}
 # Put code to reverse engineer sentence here]
-out_of_state_moore_contribs <- moore_contributions %>% 
-  filter(!str_detect(contributor_address, "^Md"))
+moore_contributions <- moore_contributions %>%
+    mutate(contributor_state = case_when(
+    str_detect(contributor_address, " AL ") ~ "Alabama",
+    str_detect(contributor_address, " AK ") ~  "Alaska",
+    str_detect(contributor_address, " AZ ") ~  "Arizona",
+    str_detect(contributor_address, " AR ") ~  "Arkansas",
+    str_detect(contributor_address, " CA ") ~  "California",
+    str_detect(contributor_address, " CO ") ~ "Colorado",
+    str_detect(contributor_address, " CT ") ~  "Connecticut",
+    str_detect(contributor_address, " DE ") ~  "Delaware",
+    str_detect(contributor_address, " FL ") ~  "Florida",
+    str_detect(contributor_address, " GA ") ~  "Georgia",
+    str_detect(contributor_address, " HI ") ~ "Hawaii",
+    str_detect(contributor_address, " ID ") ~  "Idaho",
+    str_detect(contributor_address, " IL ") ~  "Illinois",
+    str_detect(contributor_address, " IN ") ~  "Indiana",
+    str_detect(contributor_address, " IA ") ~  "Iowa",
+    str_detect(contributor_address, " KS ") ~ "Kansas",
+    str_detect(contributor_address, " KY ") ~  "Kentucky",
+    str_detect(contributor_address, " LA ") ~  "Louisiana",
+    str_detect(contributor_address, " ME ") ~  "Maine",
+    str_detect(contributor_address, " MD ") ~ "Maryland",
+    str_detect(contributor_address, " MA ") ~  "Massachusetts",
+    str_detect(contributor_address, " MI ") ~  "Michigan",
+    str_detect(contributor_address, " MN ") ~ "Minnesota",
+    str_detect(contributor_address, " MS ") ~  "Mississippi",
+    str_detect(contributor_address, " MO ") ~  "Missouri",
+    str_detect(contributor_address, " MN ") ~  "Montana",
+    str_detect(contributor_address, " NE ") ~  "Nebraska",
+    str_detect(contributor_address, " NV ") ~ "Nevada",
+    str_detect(contributor_address, " NH ") ~ "New Hampshire",
+    str_detect(contributor_address, " NJ ") ~ "New Jersey",
+    str_detect(contributor_address, " NM ") ~ "New Mexico",
+    str_detect(contributor_address, " NY ") ~  "New York",
+    str_detect(contributor_address, " NC ") ~ "North Carolina",
+    str_detect(contributor_address, " ND ") ~ "North Dakota",
+    str_detect(contributor_address, " OH ") ~ "Ohio",
+    str_detect(contributor_address, " OK ") ~ "Oklahoma", 
+    str_detect(contributor_address, " OR ") ~ "Oregon", 
+    str_detect(contributor_address, " PA ") ~ "Pennsylvania",
+    str_detect(contributor_address, " RI ") ~ "Rhode Island",
+    str_detect(contributor_address, " SC ") ~ "South Carolina",
+    str_detect(contributor_address, " SD ") ~ "South Dakota",
+    str_detect(contributor_address, " TN ") ~ "Tennessee",
+    str_detect(contributor_address, " TX ") ~ "Texas",
+    str_detect(contributor_address, " UT ") ~ "Utah",
+    str_detect(contributor_address, " VT ") ~ "Vermont",
+    str_detect(contributor_address, " VA ") ~ "Virginia",
+    str_detect(contributor_address, " WA ") ~ "Washington",
+    str_detect(contributor_address, " WV ") ~ "West Virginia",
+    str_detect(contributor_address, " WI ") ~ "Wisconsin",
+    str_detect(contributor_address, " WY ") ~ "Wyoming",
+    str_detect(contributor_address, " DC ") ~ "Washington DC",
+    TRUE ~ contributor_address
+  ))
+````
+
+```{r}
+# Put code to reverse engineer sentence here]
+ny_moore_contribs <- moore_contributions %>%
+  filter(str_detect(contributor_address, " NY ")) %>% 
+  mutate(contributor_state = "New York")
 
 # Display results of code below this codeblock
 
 ```
 
+
+
+```{r}
+out_of_state_moore_contribs <- moore_contributions %>% 
+  filter(!str_detect(contributor_address, "MD"))
+```
+
+```{r}
+out_of_state_moore_contribs_total <- out_of_state_moore_contribs %>% 
+  group_by()
+````
 ### Sentence 3
 
 * **Sentence text**: “The out-of-state fundraising has helped candidates like Moore and Perez make up ground on the financial edge held by Franchot, who still led all candidates with $3.3 million cash on hand at the end of 2021. Moore raised the most money in Maryland out of all the candidates, but also raised over $1.3 million between New York and California.”
