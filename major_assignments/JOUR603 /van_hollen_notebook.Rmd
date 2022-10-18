@@ -1,6 +1,6 @@
 ---
 title: "Chris Van Hollen"
-author: "Lisa Woelfl"
+author: "Sununu Bah"
 date: "10/11/22"
 output:
   html_document:
@@ -49,95 +49,69 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Question 1
 
-* **Question**: Where is Van Hollen's money coming from? Who is donating the most? Who are those people/organizations?
-
-* **Analysis summary**: 
-
-```{r}
-head(receipts_hollen)
-```
-
-```{r}
-total_donations_hollen <- receipts_hollen %>% 
-  group_by(contributor_name) %>% 
-  summarise(total = sum(contribution_receipt_amount)) %>% 
-  arrange(desc(total))
-
-total_donations_hollen
-```
-
-```{r}
-totalsum_donations_hollen <- receipts_hollen %>%
-  group_by(report_year) %>% 
-  summarise(total = sum(contribution_receipt_amount))
-
-totalsum_donations_hollen
-```
-
-
-```{r}
-count_donations_hollen <- receipts_hollen %>% 
-  group_by(contributor_name) %>% 
-  summarise(count_donations = n()) %>% 
-  arrange(desc(count_donations))
-
-count_donations_hollen
-```
-
+***Question 1*
+What is the total number/amount of out-of-state and in-state contributions?
 ```{r}
 receipts_hollen %>% 
-  filter(contributor_name == "PARRON-RAGLAND, DELORES L")
+  group_by(contributor_state) %>%
+  summarise(total_amount = sum(contribution_receipt_amount),
+            mean_amount= mean(contribution_receipt_amount),
+          number_of_contribs=n())%>%
+arrange(desc(total_amount))
 ```
-
-
-
-
-
-
-
-
-### Question 2
-
-* **Question**: Where is Van Hollen spending his money? How much? Where is most of his money going? Who are those people/organizations?
-
 ```{r}
-totalsum_disburs_hollen <- disburs_hollen %>%
-  group_by(report_year) %>% 
-  summarise(total = sum(disbursement_amount))
-
-totalsum_disburs_hollen
+receipts_hollen %>% 
+  summarise(total_amount = sum(contribution_receipt_amount),
+            mean_amount= mean(contribution_receipt_amount),
+          number_of_contribs=n())%>%
+arrange(desc(total_amount))
 ```
 
 ```{r}
-count_disburs_hollen <- disburs_hollen %>% 
-  group_by(recipient_name) %>% 
-  summarise(count_disburs = n()) %>% 
-  arrange(desc(count_disburs))
-
-count_disburs_hollen
+out_of_state_receipts <- receipts_hollen %>% 
+  filter(!str_detect(contributor_state, "MD"))
 ```
 
 ```{r}
-indi_disburs_hollen <- disburs_hollen %>% 
-  group_by(recipient_name) %>% 
-  filter(entity_type_desc == "INDIVIDUAL") %>% 
-  summarise(total = sum(disbursement_amount)) %>% 
-  arrange(desc(total))
-
-indi_disburs_hollen
+out_of_state_receipts %>% 
+  summarise(out_of_state_amount = sum(contribution_receipt_amount),
+            mean_amount= mean(contribution_receipt_amount),
+          number_of_contribs=n())%>%
+arrange(desc(out_of_state_amount))
 ```
-Screen Strategies is a TV advertising company that specializes in developing TV advertising for Democratic candidates 
+
+
+
+***Question 2*** What is the total number/amount of out-of-state and in-state contributions?
+```{r}
+disburs_hollen %>% 
+  group_by(recipient_state) %>%
+  summarise(total_amount = sum(disbursement_amount),
+            mean_amount= mean(disbursement_amount),
+          number_of_contribs=n())%>%
+arrange(desc(total_amount))
+
+```
+```{r}
+disburs_hollen %>% 
+summarise(total_amount = sum(disbursement_amount),
+            mean_amount= mean(disbursement_amount),
+          number_of_contribs=n())%>%
+arrange(desc(total_amount))
+```
 
 ```{r}
-total_disburs_hollen <- disburs_hollen %>% 
-  group_by(recipient_name) %>% 
-  summarise(total = sum(disbursement_amount)) %>% 
-  arrange(desc(total))
-
-total_disburs_hollen
+out_of_state_disbursements <- disburs_hollen %>% 
+  filter(!str_detect(recipient_state, "MD"))
 ```
 
-
+```{r}
+out_of_state_disbursements %>% 
+summarise(out_of_state_amount = sum(disbursement_amount),
+            mean_amount= mean(disbursement_amount),
+          number_of_contribs=n())%>%
+arrange(desc(out_of_state_amount))
+```
 
 
 
