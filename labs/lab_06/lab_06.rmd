@@ -69,14 +69,22 @@ glimpse(party_removals)
 
 ```{r}
 # Changes
-registration_changes <- read_csv("data/tabula-registration_changes.csv") %>% clean_names()\
+registration_changes <- read_csv("data/tabula-registration_changes.csv") %>% clean_names()
 
-registration_changes %>% 
+registration_changes <- registration_changes%>% 
   rename(counties = x1)
+
+registration_changes
+glimpse(registration_changes)
+  
 ```
 
 ```{r}
 # Current registrations
+current_county_registrations <- read_csv("data/tabula-current_county_registrations.csv") %>% clean_names()
+
+current_county_registrations <- current_county_registrations %>% 
+  
 ```
 
 ## Rinse, Repeat: September 2020 data
