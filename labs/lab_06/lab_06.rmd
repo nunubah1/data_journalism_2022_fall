@@ -44,46 +44,48 @@ You will need to read in and clean up the data so that it can be used for analys
 
 ```{r}
 # Party registrations
-new_party_registrations <- read_csv("data/tabula-new_party_registrations.csv") %>% clean_names()
+new_party_regis_2022 <- read_csv("data/tabula-new_party_regis_2022.csv") %>% clean_names()
 
-new_party_registrations <- new_party_registrations %>% 
+new_party_regis_2022 <- new_party_regis_2022 %>% 
   rename(types_of_registrations = x1) %>% 
   select(-dups)
-new_party_registrations
-glimpse(new_party_registrations)
+new_party_regis_2022
+glimpse(new_party_regis_2022)
 ```
 
 ```{r}
 # Removals
-party_removals <- read_csv("data/tabula-party_removals.csv") %>% clean_names()
+party_removals_2022 <- read_csv("data/tabula-party_removals_2022.csv") %>% clean_names()
 
-party_removals <- party_removals %>% 
+party_removals_2022 <- party_removals_2022 %>% 
   rename(removal_reasons = x1) %>% 
   na.omit()
 
-party_removals
-glimpse(party_removals)
+party_removals_2022
+glimpse(party_removals_2022)
 
 
 ```
 
 ```{r}
 # Changes
-registration_changes <- read_csv("data/tabula-registration_changes.csv") %>% clean_names()
+regis_changes_2022 <- read_csv("data/tabula-regis_changes_2022.csv") %>% clean_names()
 
-registration_changes <- registration_changes%>% 
+regis_changes_2022 <- regis_changes_2022%>% 
   rename(counties = x1)
 
-registration_changes
-glimpse(registration_changes)
+regis_changes_2022
+glimpse(regis_changes_2022)
   
 ```
 
 ```{r}
 # Current registrations
-current_county_registrations <- read_csv("data/tabula-current_county_registrations.csv") %>% clean_names()
+current_county_regis_2022 <- read_csv("data/tabula-current_county_regis_2022.csv") %>% clean_names()
 
-current_county_registrations <- current_county_registrations %>% 
+current_county_regis_2022 <- current_county_regis_2022 %>%
+  select(-address, -name, -dem_4, -rep_5, -grn_6, -lib_7, -wcp_8, -unaf_9, -oth_10, -total_11) %>% 
+  rename(county = x1, dem = dem_12, rep = rep_13, grn = grn_14, lib = lib_15, wcp = wcp_16, unaf = unaf_17, oth = oth_18, total = total_19, conf_mailing =  inactivemailingconf, inactive = x21)
   
 ```
 
@@ -95,18 +97,41 @@ To answer the following questions, you'll need to calculate percentages and do o
 
 ```{r}
 # Party registrations
+new_party_regis_2020 <- read_csv("data/tabula-new_party_regis_2020.csv") %>% clean_names()
+
+new_party_regis_2020 <- new_party_regis_2020 %>% 
+  rename(types_of_registrations = x1) %>% 
+  select(-dups)
+
 ```
 
 ```{r}
 # Removals
+party_removals_2020 <- read_csv("data/tabula-party_removals_2020.csv") %>% clean_names()
+
+party_removals_2020 <- party_removals_2020 %>% 
+  rename(removal_reasons = x1) %>% 
+  na.omit()
+
 ```
 
 ```{r}
 # Changes
+regis_changes_2020 <- read_csv("data/tabula-regis_changes_2020.csv") %>% clean_names()
+
+regis_changes_2020 <- regis_changes_2020%>% 
+  rename(counties = x1)
+
+
 ```
 
 ```{r}
 # Current registrations
+current_county_regis_2020 <- read_csv("data/tabula-current_county_regis_2020.csv") %>% clean_names()
+
+current_county_regis_2020 <- current_county_regis_2020 %>% 
+select(-x1, -x3, -address, -name, -x6, -dem_7, -rep_8, -grn_9, -lib_10, -wcp_11, -bar_12, -unaf_13, -oth_14, -total_15, -x16, -x26, -x29) %>% 
+rename(county = x2, dem = dem_17, rep = rep_18, grn = grn_19, lib = lib_20, wcp = wcp_21, bar = bar_22, unaf = unaf_23, oth = oth_24, total = total_25)
 ```
 
 
@@ -117,6 +142,25 @@ Q1. Calculate the percentage of registered Democrats, Republicans and unaffiliat
 A1. 
 
 ```{r}
+current_county_regis_2020 <- current_county_regis_2020 %>% 
+  mutate(percent_dem = (dem/total)*100, percent_rep = (rep/total)*100, percent_unaf = (unaf/total)*100) 
+
+current_county_regis_2022 <- current_county_regis_2022 %>% 
+  mutate(percent_dem = (dem/total)*100, percent_rep = (rep/total)*100, percent_unaf = (unaf/total)*100)
+
+current_county_regis_2022 <- current_county_regis_2022 %>%
+  mutate(dem_2020 = c(11868,175138,303826,311586,24005,6287,33890,20849,74881,9655,77282,3739,65717, 122194,5868, 413365,464963,11202,25640,5613,10865,31626,26948,13954,2250961)) %>% 
+  mutate(rep_2020 = c(22908,130762,28218,138270,28073,10617,64368,32227,23460,9016,68809,13711,80695,49372,5254,98170,37836,19746,32009,6024,11760,44282,24081,19237,998905)) %>% 
+  mutate(unaf_2020 = c(8453,98350,56663,108672,15489,4537,28865,16672,22176,3824,49092,2841,41705,57367,2594,160577,86155,8082,17028,2303,5682,22325,13629,8492,841573))
+
+
+current_county_regis_2022 <- current_county_regis_2022 %>%
+  mutate(dem_percent_change = (dem - dem_2020) / dem_2020)
+
+
+current_county_regis_2020
+current_county_regis_2022
+
 ```
 
 Q2. Among the Maryland jurisdictions with the most registered voters, which one had the biggest percentage increase in unaffiliated voters between 2020 and 2022? How did that county vote for governor in 2018 and for president in 2020? Contrast the partisan percentages of that county with the county that had the second-largest percentage increase in unaffiliated voters. You should display information from the data that shows the counties with the largest percentage increase first.
