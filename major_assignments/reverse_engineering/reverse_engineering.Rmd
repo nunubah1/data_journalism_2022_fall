@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
-In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+In this notebook, we are reverse engineering the story, [Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates](https://cnsmaryland.org/2022/03/03/millions-in-out-of-state-donations-help-fuel-high-profile-maryland-democratic-governor-candidates/)
 
 ## Load libraries
 
@@ -43,8 +43,10 @@ In this section, describe the source of the data, write a basic data dictionary 
 moore_contributions <- read_csv("data/moore_contributions.csv")
 
 perez_contributions <- read.csv("data/perez_contributions.csv")
+
+king_contributions <- read.csv("data/king_contributions.csv")
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
-glimpse(moore_contributions)
+
 
 
 # Clean required data and prepare for analysis if needed. 
@@ -54,58 +56,6 @@ moore_contributions <- moore_contributions %>%
   select(-x13)
 glimpse(moore_contributions)
 
-
-perez_contributions <- perez_contributions %>% 
-  clean_names() %>% 
-  mutate(contribution_date = mdy(contribution_date)) %>% 
-  select(-x)
-glimpse(perez_contributions)
-
-
-
-```
-
-## Sentences to Engineer
-In this notebook, we are reverse engineering five sentences from the story.
-
-### Sentence 1
-
-* **Sentence text**: “We set the pace in fundraising — including raising more money in Maryland and having 73% of donations $100 or less — because this campaign has inspired thousands of people from all walks of life in Maryland and across the country who see the opportunity to make Wes Moore governor of Maryland and change the trajectories of families who have been left behind,” the campaign said in a statement."
-
-* **Analysis summary**: Wes Moore had 8,647 unique individuals donate less than $100. One of the individuals donated less than $100 82 times. Her name is Delores Parron-Ragland. She was a distinguished social worker who's career spans in the federal government, academia, and clinical practice. She's an outlier however. The top doners 28 to 44 contributions of less than $100 however. 
-```{r}
-# Put code to reverse engineer sentence here
-less_than_hundred_moore_contribs <- moore_contributions %>% 
-  filter(contribution_amount < 100)
-```
-
-```{r}  
-less_than_hundred_moore_contribs <- less_than_hundred_moore_contribs %>%
-  group_by(contributor_name) %>% 
-  summarise(total = n(), amount = sum(contribution_amount)) %>% 
-  arrange(desc(total))
-less_than_hundred_moore_contribs
-  
-# Display results of code below this codeblock
-
-```
-
-### Sentence 2 & 3
-
-* **Sentence text**: “Moore, a U.S. Army veteran and bestselling author, built a campaign war chest that included over $2.3 million in out-of-state contributions. 
-
-Tom Perez, a former leader of the Democratic National Committee, raised nearly $1.7 million in donations from outside Maryland.” 
-
-
-
-* **Analysis summary**: Our data said that Moore had more than $4 million out-of-state contributions. 9,449 contributions for $4,098,495 to be exact.
-
-Perez on the other hand, had more than $2.4 million out-of-state contributions. 3,601 contributions for $2,451,371 to be exact. 
-
-We didn't clean our data properly. I think this has to do with the date range. Stephen's article was posted in March but the data goes as far as August. 
-
-```{r}
-# Put code to reverse engineer sentence here]
 moore_contributions <- moore_contributions %>%
     mutate(contributor_state = case_when(
     str_detect(contributor_address, " AL ") ~ "Alabama",
@@ -127,6 +77,7 @@ moore_contributions <- moore_contributions %>%
     str_detect(contributor_address, " KS ") ~ "Kansas",
     str_detect(contributor_address, " KY ") ~  "Kentucky",
     str_detect(contributor_address, " LA ") ~  "Louisiana",
+    str_detect(contributor_address, "13 Church Rd Flat 4 London UK") ~ "London",
     str_detect(contributor_address, " ME ") ~  "Maine",
     str_detect(contributor_address, " MD ") ~ "Maryland",
     str_detect(contributor_address, " MA ") ~  "Massachusetts",
@@ -148,9 +99,11 @@ moore_contributions <- moore_contributions %>%
     str_detect(contributor_address, " OR ") ~ "Oregon", 
     str_detect(contributor_address, " PA ") ~ "Pennsylvania",
     str_detect(contributor_address, " RI ") ~ "Rhode Island",
+    str_detect(contributor_address, "371 Beach Road Apt 11-04 Singapore SN") ~ "Singapore",
     str_detect(contributor_address, " SC ") ~ "South Carolina",
     str_detect(contributor_address, " SD ") ~ "South Dakota",
     str_detect(contributor_address, " TN ") ~ "Tennessee",
+    str_detect(contributor_address, "95 Lower Way Thatcham UK") ~ "Thatcham",
     str_detect(contributor_address, " TX ") ~ "Texas",
     str_detect(contributor_address, " UT ") ~ "Utah",
     str_detect(contributor_address, " VT ") ~ "Vermont",
@@ -163,11 +116,14 @@ moore_contributions <- moore_contributions %>%
     TRUE ~ contributor_address
   ))
 
-```
 
 
-```{r}
-# Put code to reverse engineer sentence here]
+perez_contributions <- perez_contributions %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x)
+glimpse(perez_contributions)
+
 perez_contributions <- perez_contributions %>%
     mutate(contributor_state = case_when(
     str_detect(contributor_address, " AL ") ~ "Alabama",
@@ -227,20 +183,133 @@ perez_contributions <- perez_contributions %>%
     TRUE ~ contributor_address
   ))
 
+king_contributions <- king_contributions %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x)
+glimpse(king_contributions)
+
+
+king_contributions <- king_contributions %>%
+  mutate(contributor_state = case_when(
+    str_detect(contributor_address, " AL ") ~ "Alabama",
+    str_detect(contributor_address, " AK ") ~  "Alaska",
+    str_detect(contributor_address, " AZ ") ~  "Arizona",
+    str_detect(contributor_address, " AR ") ~  "Arkansas",
+    str_detect(contributor_address, " CA ") ~  "California",
+    str_detect(contributor_address, "208-6100 6th Avenue Whitehorse  YT CA") ~ "Canada",
+    str_detect(contributor_address, " CO ") ~ "Colorado",
+    str_detect(contributor_address, " CT ") ~  "Connecticut",
+    str_detect(contributor_address, " DE ") ~  "Delaware",
+    str_detect(contributor_address, " FL ") ~  "Florida",
+    str_detect(contributor_address, " GA ") ~  "Georgia",
+    str_detect(contributor_address, " HI ") ~ "Hawaii",
+    str_detect(contributor_address, "27 C S BAY TOWERS 59 SOUTH BAY Rd Repulse Bay HK") ~ "Hong Kong",
+    str_detect(contributor_address, " ID ") ~  "Idaho",
+    str_detect(contributor_address, " IL ") ~  "Illinois",
+    str_detect(contributor_address, " IN ") ~  "Indiana",
+    str_detect(contributor_address, " IA ") ~  "Iowa",
+    str_detect(contributor_address, " KS ") ~ "Kansas",
+    str_detect(contributor_address, " KY ") ~  "Kentucky",
+    str_detect(contributor_address, " LA ") ~  "Louisiana",
+    str_detect(contributor_address, " ME ") ~  "Maine",
+    str_detect(contributor_address, " MD ") ~ "Maryland",
+    str_detect(contributor_address, " MA ") ~  "Massachusetts",
+    str_detect(contributor_address, " MI ") ~  "Michigan",
+    str_detect(contributor_address, " MN ") ~ "Minnesota",
+    str_detect(contributor_address, " MS ") ~  "Mississippi",
+    str_detect(contributor_address, " MO ") ~  "Missouri",
+    str_detect(contributor_address, " MT ") ~  "Montana",
+    str_detect(contributor_address, " NE ") ~  "Nebraska",
+    str_detect(contributor_address, " NV ") ~ "Nevada",
+    str_detect(contributor_address, " NH ") ~ "New Hampshire",
+    str_detect(contributor_address, " NJ ") ~ "New Jersey",
+    str_detect(contributor_address, " NM ") ~ "New Mexico",
+    str_detect(contributor_address, " NY ") ~  "New York",
+    str_detect(contributor_address, " NC ") ~ "North Carolina",
+    str_detect(contributor_address, " ND ") ~ "North Dakota",
+    str_detect(contributor_address, " OH ") ~ "Ohio",
+    str_detect(contributor_address, " OK ") ~ "Oklahoma", 
+    str_detect(contributor_address, " OR ") ~ "Oregon", 
+    str_detect(contributor_address, " PA ") ~ "Pennsylvania",
+    str_detect(contributor_address, " PR ") ~ "Puerto Rico",
+    str_detect(contributor_address, " RI ") ~ "Rhode Island",
+    str_detect(contributor_address, " SC ") ~ "South Carolina",
+    str_detect(contributor_address, " SD ") ~ "South Dakota",
+    str_detect(contributor_address, " TN ") ~ "Tennessee",
+    str_detect(contributor_address, " TX ") ~ "Texas",
+    str_detect(contributor_address, " UT ") ~ "Utah",
+    str_detect(contributor_address, " VT ") ~ "Vermont",
+    str_detect(contributor_address, " VA ") ~ "Virginia",
+    str_detect(contributor_address, " WA ") ~ "Washington",
+    str_detect(contributor_address, " WV ") ~ "West Virginia",
+    str_detect(contributor_address, " WI ") ~ "Wisconsin",
+    str_detect(contributor_address, " WY ") ~ "Wyoming",
+    str_detect(contributor_address, " DC ") ~ "Washington DC",
+    TRUE ~ contributor_address
+  ))
+
+
+```
+
+## Sentences to Engineer
+In this notebook, we are reverse engineering five sentences from the story.
+
+### Sentence 1
+
+* **Sentence text**: “We set the pace in fundraising — including raising more money in Maryland and having 73% of donations $100 or less — because this campaign has inspired thousands of people from all walks of life in Maryland and across the country who see the opportunity to make Wes Moore governor of Maryland and change the trajectories of families who have been left behind,” the campaign said in a statement."
+
+* **Analysis summary**: Our data says that only about 62% of Moore's donations are $100 or less. We went up to the date that the article was published. I'm not sure why the data is off. We even went up to 12/31/2021 but the percent just went up 1%. We cleaned and sorted everything properly.  
+
+```{r}
+moore_contributions %>%
+  filter(contribution_date <= "2022-03-02") %>%
+  summarize(total_contributions = n(), total_contribution_amount = sum(contribution_amount))
+```
+
+```{r}
+# Put code to reverse engineer sentence here
+less_than_hundred_moore_contribs <- moore_contributions %>% 
+  filter(contribution_amount < 100)
+```
+
+```{r}  
+less_than_hundred_moore_contribs %>%
+  filter(contribution_date <= "2022-03-02") %>%
+  summarize(less_than_hundred_contribs = n(), less_than_hundred_amount = sum(contribution_amount))
+
+  
 # Display results of code below this codeblock
 
 ```
 
+### Sentence 2 & 3
+
+* **Sentence text**: “Moore, a U.S. Army veteran and bestselling author, built a campaign war chest that included over $2.3 million in out-of-state contributions. 
+
+Tom Perez, a former leader of the Democratic National Committee, raised nearly $1.7 million in donations from outside Maryland.” 
+
+
+
+* **Analysis summary**: Our data said that Moore had more than $2.3 million out-of-state contributions. 5,006 contributions for $2,403,216	to be exact.
+
+Perez on the other hand, had more than $1.7 million out-of-state contributions. 2,180 contributions for $1,696,293 to be exact. 
+
+January 12 was the only date that could get us as close to the numbers as possible. But the article said Moore had more than $2.3 million instead of more than $2.4 million. That's why I believe this date may not be the correct cut-off point or there's something else wrong that we're not sure of.
+
+
 ```{r}
-moore_contributions %>% 
-group_by(contributor_state) %>%
-summarise(total_state_amount = sum(contribution_amount),
+moore_contributions %>%
+  filter(contribution_date <= "2022-01-12") %>% 
+  group_by(contributor_state) %>%
+  summarise(total_state_amount = sum(contribution_amount),
             mean_amount= mean(contribution_amount),
           number_of_contribs=n())%>%
 arrange(desc(total_state_amount))
 ```
 ```{r}
-perez_contributions %>% 
+perez_contributions %>%
+  filter(contribution_date <= "2022-01-12") %>% 
   group_by(contributor_state) %>%
   summarise(total_state_amount = sum(contribution_amount),
             mean_amount= mean(contribution_amount),
@@ -250,68 +319,73 @@ arrange(desc(total_state_amount))
 
 ```{r}
 out_of_state_moore_contributions <- moore_contributions %>% 
+  filter(contribution_date <= "2022-01-12") %>% 
   filter(!str_detect(contributor_state, "Maryland"))
 ```
 
 ```{r}
 out_of_state_moore_contributions %>%
-  summarise(total_state_amount = sum(contribution_amount),
+  summarise(out_of_state_amount = sum(contribution_amount),
           mean_amount= mean(contribution_amount),
           number_of_contribs=n())%>%
-arrange(desc(total_state_amount))
+arrange(desc(out_of_state_amount))
 
 ```
 
 ```{r}
-out_of_state_perez_contributions <- perez_contributions %>% 
-    filter(!str_detect(contributor_state, "Maryland"))
+out_of_state_perez_contributions <- perez_contributions %>%
+  filter(contribution_date <= "2022-01-12") %>% 
+  filter(!str_detect(contributor_state, "Maryland"))
 ```
 
 ```{r}
 out_of_state_perez_contributions %>%
-  summarise(total_state_amount = sum(contribution_amount),
+  summarise(out_of_state_amount = sum(contribution_amount),
           mean_amount= mean(contribution_amount),
           number_of_contribs=n())%>%
-arrange(desc(total_state_amount))
-
-```
-```
-
-### Sentence 3
-
-* **Sentence text**: “The out-of-state fundraising has helped candidates like Moore and Perez make up ground on the financial edge held by Franchot, who still led all candidates with $3.3 million cash on hand at the end of 2021. Moore raised the most money in Maryland out of all the candidates, but also raised over $1.3 million between New York and California.”
-
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
-
-```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
+arrange(desc(out_of_state_amount))
 
 ```
 
 ### Sentence 4
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: John B. King, former secretary of Education under President Barack Obama, raised $2.2 million in campaign funding last year.
+
+* **Analysis summary**: Our code said the John B. King raised less than $2.2 million in campaign funding last year. Our code said that he raised $2,018,222 for the entire 2021 year to be exact.  
 
 ```{r}
 # Put code to reverse engineer sentence here
 
 # Display results of code below this codeblock
+
+king_contributions <- king_contributions %>% 
+filter(contribution_date <= "2021-12-31")
+```
+
+```{r}
+king_contributions %>% 
+summarize(total_2021 = sum(contribution_amount)) %>% 
+arrange(desc(total_2021))
 
 ```
 
 ### Sentence 5
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+* **Sentence text**: Moore and King collected over $100,000 each from Illinois.
+* **Analysis summary**: Our code matches this. Both Moore and King collected over $100,000 each from Illinois. Moore collected $160,075.6 while King collected $118,520.2. 
+
 
 ```{r}
-# Put code to reverse engineer sentence here
-
-# Display results of code below this codeblock
-
+moore_contributions %>% 
+  filter(contributor_state == "Illinois") %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_amount = sum(contribution_amount))
 ```
 
+```{r}
+king_contributions %>% 
+  filter(contributor_state == "Illinois") %>% 
+  group_by(contributor_state) %>% 
+  summarise(total_amount = sum(contribution_amount))
+```
 -30-
