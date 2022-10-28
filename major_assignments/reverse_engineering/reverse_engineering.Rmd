@@ -1,7 +1,7 @@
 ---
 title: "Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates"
-author: "Stephen Neukam"
-date: "Date here"
+author: Sununu Bah, Abbi Ross, Dylan Manfre, Ryan Mercado
+date: 10/28/2022
 output:
   html_document:
     theme: cerulean
