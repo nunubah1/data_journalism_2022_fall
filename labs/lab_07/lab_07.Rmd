@@ -45,20 +45,34 @@ You'll also need to load the list of American Community Survey variables from th
 **Task** load the variables from the 2020 5-year ACS and save them to a dataframe
 
 ```{r}
+acs_5yr_2020 <- load_variables(2020, "acs5")
+
 ```
 
 ## Answer questions
 
 **Q1** What is the Maryland jurisdiction with the lowest median age, according to the ACS 2020 5-year estimates? You will need to find the variable for median age first.
-**A1**
+**A1** Prince George's County
 
 ```{r}
+low_med_age <- get_acs(geography = "county",
+              variables = c(medianage = "B01002_001"),
+              state = "MD",
+              year = 2020)
+
+low_med_age <- low_med_age %>% arrange(desc(estimate)) %>% top_n(20, estimate)
+
+low_med_age
 ```
 
 **Q2** Which Maryland counties have a median age of at least 50? You can use the dataframe you just made to answer this, but you must write code to display only those counties with a median age of at least 50.
-**A2** 
+**A2** Worcester County (50.5) and Talbot County (51)
 
 ```{r}
+fifty_median_age <- low_med_age %>% 
+  filter(estimate >= 50)
+
+fifty_median_age
 ```
 
 **Q3** We're interested in knowing which Maryland counties have the highest percentage of 5-17 year-olds who speak Spanish at home and *also* speak English fluently. Start with the code you wrote for Q1 and alter it to show the total population of 5-17 year-olds by county. Then create a second dataframe to show the number of 5-17 year-olds by county living in homes where Spanish is spoken but who speak English "very well" according to the ACS. To do this, you will need to find the ACS variables that represent those subjects. HINT: the phrase "very well" shows up in multiple variables - you want the one that doesn't include other factors like citizenship. 
@@ -69,7 +83,20 @@ Which county has the highest percentage of 5-17 year-olds who speak Spanish at h
 
 **A3** 
 
+
 ```{r}
+five_to_seventeen_pop <- get_acs(geography = "county",
+              variables = c(five_to_seventeen_pop = "B09001_001"),
+              state = "MD",
+              year = 2020,)
+````
+```{r}
+youth_spanish_anglais_vw <- get_acs(geography = "county",
+              variables = c(five_to_seventeen_pop = "B16004_005"),
+              state = "MD",
+              year = 2020)
+
+
 ```
 
 **Q4** Given the counties with the largest percentage of 5-17 year-olds that speak Spanish at home, which county stands out to you in the data as different from the others? How would you describe the top 5 counties? How would you describe Garrett County's numbers?
@@ -89,6 +116,11 @@ Join the ZCTA dataframe to the zip totals dataframe and calculate a per capita r
 **A5**
 
 ```{r}
+pa_zip_totals <- read_csv("data/pa_zip_totals.csv")
+```
+```{r}
+pa_zipcodes <- get_acs(geography="zcta", variables = c(medianincome = "B19013_001", population = "B01003_001"), state='PA', year=2019, output = "wide")
+pa_zips_with_acs <- pa_zip_totals %>% left_join(pa_zipcodes, by=c('zip5'='GEOID'))
 
 ```
 
