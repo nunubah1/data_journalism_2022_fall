@@ -35,7 +35,7 @@ You'll need your Census API Key:
 **Task** set your API Key if you haven't already
 
 ```{r echo=FALSE}
-census_api_key("YOUR API KEY", overwrite=TRUE)
+census_api_key("8e5e1003e1f293c26e6498ee0f4b80358a93665e", overwrite=TRUE)
 ```
 
 ## Load and view ACS variables
@@ -81,46 +81,80 @@ For each dataframe, rename the `estimate` column to a meaningful name you've giv
 
 Which county has the highest percentage of 5-17 year-olds who speak Spanish at home and also speak English very well?
 
-**A3** 
+**A3** Prince George's County with nearly 19%
 
 
 ```{r}
 five_to_seventeen_pop <- get_acs(geography = "county",
-              variables = c(five_to_seventeen_pop = "B09001_001"),
-              state = "MD",
-              year = 2020,)
-````
-```{r}
-youth_spanish_anglais_vw <- get_acs(geography = "county",
-              variables = c(five_to_seventeen_pop = "B16004_005"),
+              variables = c(five_to_seventeen_pop = "B07001_003"),
               state = "MD",
               year = 2020)
 
+five_to_seventeen_pop <- five_to_seventeen_pop %>% 
+  rename(five_to_seventeen_pop = estimate) %>% 
+  select(-variable)
+````
+```{r}
+youth_spanish_anglais_vw <- get_acs(geography = "county",
+              variables = c(fluent_english_speakers = "B16004_005"),
+              state = "MD",
+              year = 2020)
+youth_spanish_anglais_vw <- youth_spanish_anglais_vw %>% 
+  rename(fluent_english_speakers = estimate) %>% 
+  select(-variable)
+
+youth_spanish_anglais_vw <- youth_spanish_anglais_vw %>% left_join(five_to_seventeen_pop, by = c("GEOID", "NAME")) %>%
+  rename(fes_moe = moe.x, pop_moe = moe.y) %>% 
+  mutate(percent_duo_lingo = (fluent_english_speakers/five_to_seventeen_pop)*100)
+
+```
+```{r}
+youth_spanish_anglais_vw %>% 
+  arrange(desc(percent_duo_lingo))
 
 ```
 
 **Q4** Given the counties with the largest percentage of 5-17 year-olds that speak Spanish at home, which county stands out to you in the data as different from the others? How would you describe the top 5 counties? How would you describe Garrett County's numbers?
 
-**A4** 
+**A4** Prince George's and Montgomery County are pretty diverse counties. The other 3 counties: Talbot County, Dorchester County and Frederick County not as much. Frederick County is more diverse than Talbot and Dorchester but it's also nearly 4x the size of both those counties combined. Garret County doesn't even have 1% of 5-17-year-old population being duo lingo Spanish and English speakers. Garrett County is almost exclusively White. 
 
 **Q5** Pennsylvanians are currently requesting and submitting mail ballots for the November election. You'd like to know more about the people who live in the areas sending in mail ballots. Read in the `zip_totals.csv` file in the data folder containing the number of returned mail ballots per zip code. Then create a dataframe of Pennsylvania ZCTAs that include the following variables from the 2019 ACS: total population and median income. You will need to add `output = "wide"` to the get_acs function so that you get columns for those two variables' estimates and margins of error.
 
 Join the ZCTA dataframe to the zip totals dataframe and calculate a per capita rate for mail ballots per 100 population in each ZCTA, and write code to answer the following questions?
 
-* Which zip code *that has returned at least 100 mail ballots* has the highest per capita rate? 
+* Which zip code *that has returned at least 100 mail ballots* has the highest per capita rate? 15142 
 * Where is that zip code and what does Census Reporter say about its demographics? 
+The zip code is within Allegheny County. Allegheny County is 79.4% White, 13.5% Black, 4.4% Asian, 2.4% Hispanic or Latino
 * For zip codes with a per capita rate of at least 10 returned ballots per 100 people, how many have median incomes of at least $100,000? 
-* How many have median incomes less than the state figure of $68,957? 
+4
+* How many have median incomes less than the state figure of $68,957?
+18
 * What's the most interesting one from this last result?
+Zip code 15139. It has the highest count by a wide margin despite having a relatively average median income. 
 
 **A5**
 
 ```{r}
 pa_zip_totals <- read_csv("data/pa_zip_totals.csv")
 ```
+
 ```{r}
-pa_zipcodes <- get_acs(geography="zcta", variables = c(medianincome = "B19013_001", population = "B01003_001"), state='PA', year=2019, output = "wide")
-pa_zips_with_acs <- pa_zip_totals %>% left_join(pa_zipcodes, by=c('zip5'='GEOID'))
+pa_zipcodes <- get_acs(geography="zcta", variables = c(medianincome = "B19013_001", population = "B01003_001"), state='PA', year=2019, output = "wide") 
+```  
+```{r}
+pa_zips_with_acs <- pa_zip_totals %>% inner_join(pa_zipcodes, by=c('zip'='GEOID')) %>%
+  mutate(per_capita_income = medianincomeE / populationE) %>% 
+  mutate(per_capita_ballots = (count /populationE)*100)
 
 ```
 
+```{r}
+pa_zips_with_acs %>% 
+  filter(count >= 100) %>% 
+  arrange(desc(per_capita_income))
+```
+```{r}
+pa_zips_with_acs %>%
+  filter(per_capita_ballots >= 10) %>% 
+  arrange(desc(medianincomeE))
+```
