@@ -41,9 +41,26 @@ In this section, describe the source of the data, write a basic data dictionary 
 # Load required data
 
 elrich_contributions_2022 <- read_csv("data/elrich_contributions_2022.csv")
+#This data set contains 2,981 rows and 13 columns. 
 blair_contributions_2022 <- read_csv("data/blair_contributions_2022.csv")
-
+#This data set contains 556 rows and 13 columns. 
 elrich_contributions_2018 <- read_csv("data/elrich_contributions_2018.csv")
+#This data set contains 4,010 rows and 13 columns. 
+blair_contributions_2018 <- read_csv("data/blair_contributions_2018.csv")
+#This data set contains 881 rows and 13 columns. 
+
+dem_results_22 <- read_csv("data/dem_results_22.csv")
+#This data set contains 32 rows and 11 columns. 
+dem_results_18 <- read_csv("data/dem_results_18.csv")
+#This data set contains 216 rows and 11 columns.
+ 
+
+dem_precincts_22 <- read_csv("data/dem_precincts_22.csv")
+#This data set contains 18,298 rows and 13 columns. 
+dem_precincts_18 <- read_csv("data/dem_precincts_18.csv")
+# This data set contains 27,791 rows and 11 columns.
+
+
 
 # Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
 
@@ -52,19 +69,37 @@ elrich_contributions_2018 <- read_csv("data/elrich_contributions_2018.csv")
 # Clean required data and prepare for analysis if needed. 
 
 elrich_contributions_2022 <- elrich_contributions_2022 %>% 
-  clean_names() %>% 
-  mutate(contribution_date = mdy(contribution_date)) %>% 
+  clean_names() %>%
   select(-x13)
 
 elrich_contributions_2018 <- elrich_contributions_2018 %>% 
   clean_names() %>% 
-  mutate(contribution_date = mdy(contribution_date)) %>% 
   select(-x13)
 
 blair_contributions_2022 <- blair_contributions_2022 %>% 
   clean_names() %>% 
-  mutate(contribution_date = mdy(contribution_date)) %>% 
   select(-x13)
+
+blair_contributions_2018 <- blair_contributions_2018 %>% 
+  clean_names() %>% 
+  select(-x13)
+
+
+dem_results_22 <- dem_results_22 %>% 
+  clean_names() 
+
+dem_results_18 <- dem_results_18 %>% 
+  clean_names()
+
+
+dem_precincts_22 <- dem_precincts_22 %>% 
+  clean_names()
+
+dem_precincts_18 <- dem_precincts_18 %>% 
+  clean_names()
+
+#Week Two Update: We  feel relatively comfortable with the data that we were able to find and download this week. Cleaning it was not that time consuming and it seems that we have all of the information we will need, other than the 2022 county results data and some iffy things surrounding mail/absentee ballots. Our first two questions are about self-funding and top contributors, which at this point do not seem like they should be an issue. Our third question is supposed to look at early voting and mail in votes. Right now it looks like the second half of the problem could be an issue. If so, we can tweak the question to focus solely on early votes and dive deeper into that. Our other questions are about campaign finances going toward ads and precinct level data, both of which we should be good to go on. The data sets we are analyzing are for two filing periods, 2022 and 2018. We chose these years because Elrich and Blair ran for the same position in both. The 2022 and 2018 campaign finance data sets are limited to any contributions made during that filing year. Other than the one data set not including all of the information we need, we're not seeing any major reasons that won't be able to complete our work. We did see where we will have to do something similar to our first project, where the state is identified by acronym instead of it's full name, so we will have to change that.Ryan did try to create a 2022 county result sheet, but we cannot get it to load.
+
 
 
 ```
