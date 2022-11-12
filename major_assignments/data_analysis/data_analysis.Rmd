@@ -1,0 +1,120 @@
+---
+title: "Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates"
+author: Sununu Bah, Abbi Ross, Dylan Manfre, Ryan Mercado
+date: 10/28/2022
+output:
+  html_document:
+    theme: cerulean
+    highlight: pygments
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction 
+
+In this notebook, we are reverse engineering the story, [Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates](https://cnsmaryland.org/2022/03/03/millions-in-out-of-state-donations-help-fuel-high-profile-maryland-democratic-governor-candidates/)
+
+## Load libraries
+
+Loading required libraries for this analysis.
+
+```{r echo=FALSE, message=FALSE}
+# turn off sci notation
+options(scipen=999)
+library(tidyverse)
+library(lubridate)
+library(janitor)
+
+```
+
+## Load and Cleaning Data
+
+In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
+
+```{r}
+# Load required data
+
+elrich_contributions_2022 <- read_csv("data/elrich_contributions_2022.csv")
+blair_contributions_2022 <- read_csv("data/blair_contributions_2022.csv")
+
+elrich_contributions_2018 <- read_csv("data/elrich_contributions_2018.csv")
+
+# Path to data should be loaded from folder "data" i.e. read_csv("data/name_of_data.csv")
+
+
+
+# Clean required data and prepare for analysis if needed. 
+
+elrich_contributions_2022 <- elrich_contributions_2022 %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x13)
+
+elrich_contributions_2018 <- elrich_contributions_2018 %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x13)
+
+blair_contributions_2022 <- blair_contributions_2022 %>% 
+  clean_names() %>% 
+  mutate(contribution_date = mdy(contribution_date)) %>% 
+  select(-x13)
+
+
+```
+
+## Sentences to Engineer
+In this notebook, we are reverse engineering five sentences from the story.
+
+### Question 1
+
+* **Sentence text**: 
+
+* **Analysis summary**:   
+
+```{r}
+```
+
+
+### Question 2
+
+* **Sentence text**: 
+
+* **Analysis summary**:   
+
+```{r}
+```
+
+### Question 3
+
+* **Sentence text**: 
+
+* **Analysis summary**:   
+
+```{r}
+```
+
+### Question 4
+
+* **Sentence text**: 
+
+* **Analysis summary**:   
+
+```{r}
+```
+
+
+### Question 5
+
+* **Sentence text**: 
+
+* **Analysis summary**:   
+
+```{r}
+```
