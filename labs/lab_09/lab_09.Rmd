@@ -1,0 +1,141 @@
+---
+title: "lab_09"
+author: "Derek Willis"
+date: "11/09/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* the tidyverse, janitor and tigris libraries
+* you might choose to use the tidycensus library for Q4
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load libraries
+library(tidyverse)
+library(sf)
+library(janitor)
+library(tigris)
+
+```
+
+Let's explore the election results from last night and make some maps! 
+
+## Questions 
+
+**Q1.** Make a county-level map of Maryland's results for governor using `md_gov_county.csv` in the data folder, calculating the difference between Wes Moore's percentage of the total votes and Dan Cox's percentage of the total votes and displaying that percentage difference on the map. What is the story here, and what is the county with the most interesting results?
+
+**A1.**  Cox seems to have have most of the map in his favor but they are relatively lower population areas compared to the other counties in Maryland such as Montgomery, Prince George's etc. The story has to be that Moore dominated Cox in Montgomery and Prince George's County by gaining at least 78% of the county votes. Also another story could be Cox winning Frederick County by a narrow margin and Moore only winning Anne Arundel County by narrow margin.  
+
+```{r}
+md_gov_county <- read_csv("data/md_gov_county.csv")
+md_gov_county <- md_gov_county %>% 
+  clean_names() %>% 
+  mutate(write_ins_22 = write_ins) %>% 
+  mutate(total_22 = rowSums(md_gov_county[, 3:8])) %>%
+  mutate(moore_percentage = (moore/total_22)*100) %>% 
+  mutate(cox_percentage = (cox/total_22)*100) %>% 
+  mutate(moore_cox_perc_diff = moore_percentage - cox_percentage)
+
+counties <- counties()
+
+md_counties <- counties %>%
+  filter(STATEFP == "24") %>% 
+  clean_names() %>% 
+  mutate(geoid = as.numeric(geoid))
+glimpse(md_counties)
+
+md_gov_county_map <- md_counties %>% left_join(md_gov_county, by="geoid")
+
+ggplot()+
+  geom_sf(data = md_gov_county_map, aes(fill=moore_cox_perc_diff))+
+  scale_fill_viridis_b(option = "magma")+
+  theme_minimal()
+  
+
+```
+
+**Q2.** Make another map showing the difference between Dan Cox's county-level performance in 2022 and Larry Hogan's in 2018, using percentages to compare the two as you did in Q1. You can use the dataframe you initially loaded for Q1, and you'll need to load the 2018 governor results in the data folder and join them to it before proceeding. Are there any counties where Cox got a higher percentage than Hogan? How would you describe the map showing the Hogan-Cox difference?
+
+Also answer this: is a map the best way to present this data? What else could you make that might convey more information?
+
+**A2.** There are no counties where Cox got a higher percentage than Hogan. In nearly all of the counties except two (Somerset and Garrett), Hogan got at least 10% more votes in 2018 than Cox did in 2022. You could make a line graph or scatter plot to show the decline in the Republican vote for Governor. 
+
+```{r}
+md_gov_county_18 <- read_csv("data/md_gov_county_18.csv")
+
+md_gov_county_18 <- md_gov_county_18 %>% 
+  clean_names() %>% 
+  mutate(write_ins_18 = write_ins) %>% 
+  mutate(total_18 = rowSums(md_gov_county_18[, 3:7])) %>% 
+  mutate(hogan_percentage = (hogan/total_18)*100) 
+
+md_gov_county_map <- md_gov_county_map %>% left_join(md_gov_county_18, by = "geoid")
+
+md_gov_county_map <- md_gov_county_map %>% 
+  mutate(cox_hogan_diff = (cox_percentage - hogan_percentage))
+
+ggplot()+
+  geom_sf(data = md_gov_county_map, aes(fill=cox_hogan_diff))+
+  scale_fill_viridis_b(option = "magma")+
+  theme_minimal()
+```
+
+**Q3** Which county has the highest percentage of mail ballots remaining to be counted? Using the `mail_remaining.csv` file in the data folder, calculate the percentage of mail ballots remaining, then map a county map of those percentages. Looking at both the map and the data, are there counties where the candidate currently leading the governor's race could, in theory, change?
+
+**A3** I think Frederick County could realistically change. There are 14,253 remaining mail-in ballots to be counted and Cox only leads Moore by 1,597 votes. Same thing with Anne Arundel county. Moore only leads Cox by 4,409 votes but there are 41,918 remaining mail-in ballots to be counted. But then again, Democrats are more likely to vote by mail. 
+
+```{r}
+mail_remaining <- read_csv("data/mail_remaining.csv")
+
+mail_remaining <- mail_remaining %>% 
+  clean_names() %>% 
+  mutate(percent_remaining = (remaining/total_returned)*100)
+
+md_mail_county_map <- md_counties %>% left_join(mail_remaining, by="geoid")
+
+ggplot()+
+  geom_sf(data = md_mail_county_map, aes(fill=percent_remaining))+
+  scale_fill_viridis_b(option = "magma")+
+  theme_minimal()
+
+```
+
+**Q4.** Choose your own map adventure! In the data folder I've included county-level results for several other 2022 contests, including the Comptroller, Attorney General and the marijuana legalization amendment. I've also added the 2020 presidential results by county. Using one of the 2022 races that we haven't already used and at least one other contest for comparison, make a county-level map showing what you think is the most interesting aspect of that data, and describe the results in terms of a possible story. You can bring in other data, such as Census information, if you like.
+
+**A4.**  
+```{r}
+md_pres_county_20 <- read_csv("data/md_pres_county_20.csv") %>% 
+  clean_names()
+```
+
+```{r}
+md_pres_county_20 <- md_pres_county_20 %>% 
+  mutate(total_20 = rowSums(md_pres_county_20[,3:7])) %>% 
+  mutate(trump_percentage = (trump/total_20)*100) %>% 
+  mutate(biden_percentage = (biden/total_20)*100)
+
+md_pres_gov_map <- md_gov_county_map %>% left_join(md_pres_county_20, by="geoid")
+
+md_pres_gov_map <- md_pres_gov_map %>% 
+  mutate(moore_biden_diff = moore_percentage - biden_percentage)
+
+ggplot()+
+  geom_sf(data = md_pres_gov_map, aes(fill=moore_biden_diff))+
+  scale_fill_viridis_b(option = "magma")+
+  theme_minimal()
+```
+
+
+-30-
