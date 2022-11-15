@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
-In this notebook, we are reverse engineering the story, [Millions in out-of-state donations help fuel high-profile Maryland Democratic governor candidates](https://cnsmaryland.org/2022/03/03/millions-in-out-of-state-donations-help-fuel-high-profile-maryland-democratic-governor-candidates/)
+
 
 ## Load libraries
 
@@ -81,7 +81,7 @@ blair_contributions_2022 <- blair_contributions_2022 %>%
   select(-x13)
 
 blair_contributions_2018 <- blair_contributions_2018 %>% 
-  clean_names() %>% 
+  clean_names() %>%
   select(-x13)
 
 
@@ -105,30 +105,100 @@ dem_precincts_18 <- dem_precincts_18 %>%
 ```
 
 ## Sentences to Engineer
-In this notebook, we are reverse engineering five sentences from the story.
+In this notebook, we are engineering five questions that we proposed after gathering blair and elrich contribution and election results data.
 
 ### Question 1
 
-* **Sentence text**: 
+* **Question**: How much money did David Blair and Marc Elrich fund themselves in 2022 vs. 2018? Blair is a businessman and millionaire, so it makes sense that he’s funding his own campaign. But how much exactly is he putting into it, and how does it compare to the past election and to how much Elrich’s campaign is raising?
 
 * **Analysis summary**:   
 
 ```{r}
+blair_contributions_2022 %>%
+  mutate(contributor_name = case_when(
+  contributor_name == "BLAIR  DAVID  THOMAS" ~ "Blair  David  Thomas",
+  TRUE ~ contributor_name
+  )) %>% 
+filter(contributor_name == "Blair  David  Thomas") %>%
+group_by(contributor_name) %>%
+summarize(total_blair = sum(contribution_amount))
 ```
-
-
+```{r}
+blair_contributions_2018 %>%
+  mutate(contributor_name = case_when(
+  contributor_name == "BLAIR  DAVID  THOMAS" ~ "Blair  David  Thomas",
+  TRUE ~ contributor_name
+  )) %>% 
+filter(contributor_name == "Blair  David  Thomas") %>%
+group_by(contributor_name) %>%
+summarize(total_blair = sum(contribution_amount))
+```
+```{r}
+elrich_contributions_2022 %>%
+  filter(contributor_name == "Elrich  Marc") %>% 
+  group_by(contributor_name) %>% 
+  summarize(total_blair = sum(contribution_amount))
+```
+```{r}
+elrich_contributions_2018 %>%
+  filter(contributor_name == "Elrich  Marc") %>% 
+  group_by(contributor_name) %>% 
+  summarize(total_blair = sum(contribution_amount))
+```
 ### Question 2
 
-* **Sentence text**: 
+* **Question**: Who were the top 5 contributors to Blair and Elrich in 2022? How about in 2018? What are their connections to the candidates?
 
-* **Analysis summary**:   
+* **Analysis summary**:  
 
 ```{r}
+top_blair_contribs_22 <- blair_contributions_2022 %>% 
+  mutate(contributor_name = case_when(
+    contributor_name == "BLAIR  DAVID  THOMAS" ~ "Blair  David  Thomas",
+    TRUE ~ contributor_name
+  )) %>% 
+  group_by(contributor_name) %>% 
+  summarize(total = sum(contribution_amount)) %>% 
+  arrange(desc(total)) %>% 
+  head(5)
+top_blair_contribs_22
 ```
+
+```{r}
+top_blair_contribs_18 <- blair_contributions_2018 %>%
+  mutate(contributor_name = case_when(
+    contributor_name == "BLAIR  DAVID  THOMAS" ~ "Blair  David  Thomas",
+    TRUE ~ contributor_name
+  )) %>% 
+  group_by(contributor_name) %>% 
+  summarize(total = sum(contribution_amount)) %>% 
+  arrange(desc(total)) %>% 
+  head(5)
+top_blair_contribs_18
+```
+
+```{r}
+top_elrich_contribs_22 <- elrich_contributions_2022 %>% 
+  group_by(contributor_name) %>% 
+  summarize(total = sum(contribution_amount)) %>% 
+  arrange(desc(total)) %>% 
+  head(6)
+top_elrich_contribs_22
+```
+
+```{r}
+top_elrich_contribs_18 <- elrich_contributions_2018 %>% 
+  group_by(contributor_name) %>% 
+  summarize(total = sum(contribution_amount)) %>% 
+  arrange(desc(total)) %>% 
+  head(6)
+top_elrich_contribs_18
+```
+
 
 ### Question 3
 
-* **Sentence text**: 
+* **Quesion**: David Blair got more early/election day votes in 2022. Elrich got more Mail-in votes in 2022. How did that compare to 2018? People want to know how Marc Elrich won both times, first by 72 voters in 2018 and then 32 in 2022. Where did Marc do well in the three categories: Early voting, election day, and mail-in votes. Did this sway the result at all?
 
 * **Analysis summary**:   
 
@@ -137,7 +207,7 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Question 4
 
-* **Sentence text**: 
+* **Question**: Which parts of the county voted for Elrich and which voted for Blair based on precinct-level voting? Are there differences in demographics of those areas? What about income?
 
 * **Analysis summary**:   
 
@@ -147,7 +217,7 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Question 5
 
-* **Sentence text**: 
+* **Question**: Where did David Blair and Marc Elrich spend their money on campaign finance resources? Ie: Meta advertisements, yard signs, TV, consulting? This would be interesting to know since Blair made a very big concerted effort to build his profile during the campaign while Elrich relied on incumbency and mainly TV ads to help him. 
 
 * **Analysis summary**:   
 
