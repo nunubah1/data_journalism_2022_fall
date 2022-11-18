@@ -100,7 +100,7 @@ write_csv(percent_md_votes_by_type, "data/percent_md_votes_by_type.csv")
 
 What do you think the story here is, and what would you want to know more about? Put the answer below along with the URL of your chart.
 
-**A3.** 
+**A3.** https://datawrapper.dwcdn.net/kvXt2/1/ The story here is Montgomery County zip codes comprising majority of Act Blue donors in Maryland. Why isn't other wealthy counties such as Howard County donating more to Act Blue or Prince George's County, one of the wealthiest Black counties in the states.
 
 ```{r}
 md_actblue <- read_csv("data/md_actblue_zip.csv")
@@ -111,4 +111,5 @@ md_actblue %>%
 ```{r}
 md_actblue <- md_actblue %>% 
   mutate(pct_total = (total/20328513)*100)
+write_csv(md_actblue, "data/md_actblue_zip.csv")
 ```
