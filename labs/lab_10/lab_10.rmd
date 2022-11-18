@@ -1,0 +1,114 @@
+---
+title: "lab_10.Rmd"
+author: "derek willis"
+date: "11/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## You will need
+
+* A Datawrapper account
+* Election data in CSV files in the `data` folder
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+# load libraries here
+library(tidyverse)
+library(sf)
+library(janitor)
+library(tigris)
+```
+
+## Questions
+
+**Q1.** In the previous lab, you made a map showing the difference between the electoral performances of Dan Cox in 2022 and Larry Hogan in 2018. Except a map is probably not the best way to show that. Let's make a chart instead, and the type is up to you, but the goal is to clearly show the differences between the two.
+
+You MUST do the following things when answering this question:
+* Load the `md_county_gov.csv` and `md_county_gov_18.csv` files in the data folder
+* Join those dataframes, specifying the join column. You should add columns to generate percentages for Cox and Hogan.
+* Export that joined dataframe to a CSV file using `write_csv`.
+* Using that exported CSV, make a chart with Datawrapper. What kind of chart is up to you, so experiment with a few kinds of charts to see what answers the question above in the clearest way. Your chart MUST:
+  * Have a title, description and source that tells readers about the data. The title and description should highlight the most newsworthy or important aspect.
+  * Easily readable labels and values
+* Publish your chart (you may need to confirm your Datawrapper account if you haven't already in order to do this)
+* Put the answer below along with the URL of your chart.
+
+**A1.** https://datawrapper.dwcdn.net/vMzi3/1/
+
+```{r}
+md_gov_county <- read_csv("data/md_gov_county.csv") %>% 
+  clean_names() %>%
+  rename(county_22 = county) %>% 
+  rename(write_ins_22 = write_ins) %>% 
+  mutate(total_22 = rowSums(md_gov_county[, 3:9])) %>% 
+  mutate(cox_percent_22 = (cox/total_22)*100)
+
+md_gov_county_18 <- read_csv("data/md_gov_county_18.csv") %>% 
+  clean_names() %>%
+  rename(county_18 = county) %>% 
+  rename(write_ins_18 = write_ins) %>%
+  mutate(total_18 = rowSums(md_gov_county[, 3:7])) %>%
+  mutate(hogan_percent_18 = (hogan/total_18)*100)
+
+combined_md_gov_results <- md_gov_county %>% left_join(md_gov_county_18, by="geoid")
+
+combined_md_gov_results <- combined_md_gov_results %>% 
+  mutate(cox_hogan_diff = cox_percent_22 - hogan_percent_18)
+
+ write_csv(combined_md_gov_results, "data/combined_md_gov_results.csv")
+
+
+
+
+```
+
+**Q2.** You're interested in seeing how the methods of voting have changed in Maryland since 2018. Using the `md_votes_by_type.csv` that has data from the top of the ticket (governor in 2018 and 2022, president in 2020), make a chart showing the percentage of votes cast in each category - early voting, election day and mail - over the three years. You'll need to make those percentages in R and then export the CSV using `write_csv`, then make the chart in Datawrapper. Have a title, description and source that tells readers about the data. The title and description should highlight the most newsworthy or important aspect.
+
+HINT: In Datawrapper's "Check and Describe" tab, you can click on a column to get the option of "hiding" it in any visualization.
+
+What do you think the story here is? Put the answer below along with the URL of your chart.
+
+**A2.** https://datawrapper.dwcdn.net/5UGmZ/1/ The story here is the decline in voters by mail from the pandemic year in 2020 to 2022. Only 7.1 percent of voters voted by mail in 2018, while in 2020 49.5% of voters voted by mail. This decreases in 2022 when 19.3% of voters voted by mail. 
+
+```{r}
+md_votes_by_type <- read_csv("data/md_votes_by_type.csv") %>% 
+  clean_names()
+
+write_csv(md_votes_by_type, "data/md_votes_by_type.csv")
+
+percent_md_votes_by_type <- md_votes_by_type %>% 
+  select(year, pct_early, pct_election_day, pct_mail)
+  
+
+write_csv(percent_md_votes_by_type, "data/percent_md_votes_by_type.csv")
+```
+
+
+**Q3.** You want to know the geography of ActBlue donors who live in Maryland, so load in the `md_actblue_zip.csv` file in the data folder and calculate a grand total of the totals for each zip code in the dataframe. Using that total, calculate a percentage of the total for each zip code (you can hard code that number). The export the dataframe using `write_csv` and make a choropleth map in Datawrapper. You will need to:
+
+* Search for Maryland zip codes (use the 2020 data) as the base map
+* Upload the CSV file
+* Change the tooltip to show both the amount and the percentage (you can put them side by side or put one under the other). Make sure to properly format both numbers to make them readable.
+* Have a title, description and source that tells readers about the data. The title and description should highlight the most newsworthy or important aspect.
+
+What do you think the story here is, and what would you want to know more about? Put the answer below along with the URL of your chart.
+
+**A3.** 
+
+```{r}
+md_actblue <- read_csv("data/md_actblue_zip.csv")
+
+md_actblue %>% 
+  summarize(total = sum(total))
+```
+```{r}
+md_actblue <- md_actblue %>% 
+  mutate(pct_total = (total/20328513)*100)
+```
