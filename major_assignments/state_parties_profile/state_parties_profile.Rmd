@@ -360,7 +360,16 @@ dem_contribs_2122 %>%
 **A2** 
 
 ```{r}
-
+rep_spending_2122 %>% 
+  group_by(recipient_name) %>% 
+  summarize(amount = sum(disbursement_amount)) %>% 
+  arrange(desc(amount))
+```
+```{r}
+rep_spending_2122 %>% 
+  group_by(recipient_name) %>% 
+  summarize(amount = sum(disbursement_amount)) %>% 
+  arrange(desc(amount))
 ```
 
 **Q3** When you compare the two parties, where are the differences and similarities?
@@ -368,6 +377,7 @@ dem_contribs_2122 %>%
 **A3** 
  
 ```{r}
+
 ```
 
 **Q4** What about either the donors or the spending that prompts further questions from you?
