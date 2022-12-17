@@ -1,0 +1,378 @@
+---
+title: "State Parties Profile - Florida"
+author: "Sununu Bah"
+date: "12/18/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Assignment Task
+For this assignment, you will be given a state that saw multiple competitive House or Senate elections in 2022 (Maryland won’t be one of them; it had just one competitive federal election this year). Your task is to provide a profile, using data, of what the two major political parties (Republican and Democratic) in your state did in terms of raising and spending money.
+
+
+## What Prof wants to see
+
+- Generating summary data from itemized data using group_by and summarize.
+- Cleaning up data as necessary (for example, you could examine the locations of donors or the names of recipients).
+- Describing in text the results of your work, your questions and potential story ideas.
+- Visualizing data through at least two (2) charts and maps.
+
+
+## Other bits and info
+
+You will do this exploration and analysis in an R Markdown notebook that you create and put in your major assignments folder. Your notebook should be free of errors and I should be able to run the code in it from start to finish. The data you use should be included in your repository unless it is more than 50MB in size, in which case you can place it in a separate location that you give me access to (for example, Google Drive).
+
+This assignment will be worth the equivalent of three labs. It will be due at the end of the semester and I will accept submissions through Dec. 18 (so you have approximately one month).
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab.
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(dplyr)
+```
+
+## Getting the Data
+
+To accomplish this you will need to identify the two party committees in your state (here’s a list of states and the FEC committee IDs for the two parties) and download fundraising and spending data from the Federal Election Commission covering the 2021-2022 election cycle. Currently, that data covers January 1, 2021 through Oct. 19, 2022, but it will be updated after Dec. 8. You should not wait to get started, but you should check after Dec. 11 to see if more data is available and try to incorporate it. The FEC site allows you to export the data to a CSV file, so you will be exporting both individual contributions and all expenditures.
+
+You are encouraged to bring in other data, such as election results or voter registration information, but the bulk of the analysis should be on the campaign finance data. You can learn more about which House and Senate races were considered competitive in each state, too.
+
+
+**Task** Load in the data
+
+```{r}
+rep_spending_2122 <- read_csv("data/fl_rep_spending.csv")
+dem_spending_2122 <- read_csv("data/fl_dem_spending.csv")
+
+rep_contribs_2122 <- read_csv("data/fl_rep_contributions.csv")
+dem_contribs_2122 <- read_csv("data/fl_dem_contributions.csv")
+
+
+
+```
+**Task** Clean the data
+
+
+## Republican Spending Data Cleaning
+
+```{r}
+glimpse(rep_spending_2122)
+```
+
+```{r}
+rep_spending_2122 <- rep_spending_2122 %>% 
+  clean_names() %>% 
+  select(-national_committee_nonfederal_account) %>% 
+  select(-memo_code_full) %>% 
+  select(-candidate_prefix) %>% 
+  select(-candidate_suffix) %>% 
+  select(-election_type_full) %>% 
+  select(-original_sub_id) %>% 
+  select(-back_reference_transaction_id) %>% 
+  select(-back_reference_schedule_id) %>% 
+  select(-conduit_committee_name) %>% 
+  select(-conduit_committee_street1)%>% 
+  select(-conduit_committee_street2)%>%
+  select(-conduit_committee_city)%>% 
+  select(-conduit_committee_state)%>%
+  select(-conduit_committee_zip) %>%
+  select(-spender_committee_org_type) %>%
+  select(-memo_text) %>% 
+  select(-payee_prefix) %>% 
+  select(-payee_suffix) %>% 
+  select(-payee_employer) %>% 
+  select(-payee_occupation) %>% 
+  select(-ref_disp_excess_flg) %>% 
+  select(-comm_dt) %>% 
+  
+  mutate(disbursement_date = as.Date(disbursement_date)) 
+```
+
+
+## Democratic Spending Data Cleaning
+
+```{r}
+glimpse(dem_spending_2122)
+```
+
+```{r}
+dem_spending_2122 <- dem_spending_2122 %>% 
+  clean_names() %>% 
+  select(-beneficiary_committee_name) %>% 
+  select(-national_committee_nonfederal_account) %>% 
+  select(-memo_code_full) %>%
+  select(-candidate_office) %>% 
+  select(-candidate_office_description) %>% 
+  select(-candidate_office_district) %>% 
+  select(-candidate_id) %>% 
+  select(-candidate_name) %>% 
+  select(-candidate_first_name) %>% 
+  select(-candidate_last_name) %>% 
+  select(-candidate_middle_name) %>% 
+  select(-candidate_prefix) %>% 
+  select(-candidate_suffix) %>%
+  select(-candidate_office_state) %>% 
+  select(-candidate_office_state_full) %>%
+  select(-election_type_full) %>% 
+  select(-original_sub_id) %>% 
+  select(-category_code) %>% 
+  select(-category_code_full) %>%
+  select(-conduit_committee_name) %>% 
+  select(-conduit_committee_street1)%>% 
+  select(-conduit_committee_street2)%>%
+  select(-conduit_committee_city)%>% 
+  select(-conduit_committee_state)%>%
+  select(-conduit_committee_zip) %>%
+  select(-spender_committee_org_type)%>% 
+  select(-payee_prefix) %>% 
+  select(-payee_employer) %>% 
+  select(-payee_occupation) %>% 
+  select(-ref_disp_excess_flg) %>% 
+  select(-comm_dt) %>% 
+  select(-payee_suffix) %>% 
+  
+  mutate(disbursement_date = as.Date(disbursement_date))
+```
+
+
+## Republican Contributions Data Cleaning
+
+```{r}
+glimpse(rep_contribs_2122)
+```
+
+```{r}
+rep_contribs_2122 <- rep_contribs_2122 %>% 
+  clean_names() %>% 
+  select(-committee_name_9) %>% 
+  select(-contributor_prefix) %>% 
+  select(-recipient_committee_org_type) %>% 
+  select(-memo_code_full) %>% 
+  select(-candidate_id) %>% 
+  select(-candidate_name) %>% 
+  select(-candidate_first_name) %>% 
+  select(-candidate_last_name) %>% 
+  select(-candidate_middle_name) %>% 
+  select(-candidate_prefix) %>% 
+  select(-candidate_suffix) %>% 
+  select(-candidate_office) %>%
+  select(-candidate_office_full) %>%
+  select(-candidate_office_state) %>%
+  select(-candidate_office_state_full) %>%
+  select(-candidate_office_district) %>%
+  select(-conduit_committee_id) %>%
+  select(-conduit_committee_name) %>%
+  select(-conduit_committee_street1) %>%
+  select(-conduit_committee_street2) %>%
+  select(-conduit_committee_city) %>%
+  select(-conduit_committee_state) %>%
+  select(-conduit_committee_zip) %>%
+  select(-donor_committee_name) %>%
+  select(-national_committee_nonfederal_account) %>%
+  select(-election_type_full) %>% 
+  select(-original_sub_id) %>% 
+  select(-increased_limit) %>% 
+  
+  mutate(contribution_receipt_date = as.Date(contribution_receipt_date)) %>% 
+  
+  rename(committee_name = committee_name_2)
+```
+
+
+## Democrat Contributions Data Cleaning
+
+```{r}
+glimpse(dem_contribs_2122)
+```
+
+```{r}
+dem_contribs_2122 <- dem_contribs_2122 %>% 
+  clean_names() %>% 
+  select(-committee_name_9) %>% 
+  select(-contributor_prefix) %>% 
+  select(-recipient_committee_org_type) %>% 
+  select(-receipt_type_full) %>% 
+  select(-memo_code_full) %>% 
+  select(-candidate_id) %>% 
+  select(-candidate_name) %>%
+  select(-candidate_first_name) %>% 
+  select(-candidate_last_name) %>% 
+  select(-candidate_middle_name) %>% 
+  select(-candidate_prefix) %>%
+  select(-candidate_suffix) %>%
+  select(-candidate_office) %>%
+  select(-candidate_office_full) %>%
+  select(-candidate_office_state) %>%
+  select(-candidate_office_state_full) %>%
+  select(-candidate_office_district) %>%
+  select(-conduit_committee_id) %>%
+  select(-conduit_committee_name) %>%
+  select(-conduit_committee_street1) %>%
+  select(-conduit_committee_street2) %>%
+  select(-conduit_committee_city) %>%
+  select(-conduit_committee_state) %>%
+  select(-conduit_committee_zip) %>%
+  select(-national_committee_nonfederal_account) %>% 
+  select(-election_type_full) %>% 
+  select(-original_sub_id) %>% 
+  select(-increased_limit) %>% 
+  
+  mutate(contribution_receipt_date = as.Date(contribution_receipt_date)) %>% 
+  
+  rename(committee_name = committee_name_2)
+```
+
+
+## Questions
+
+**Q1.** How can you describe (broadly) the party’s donors? Where do the parties get their money and from what kinds of donors? Do they raise a lot in small amounts or from out of state donors?
+
+**A1.** The Republican Party primarily received most of their money from other Republican committees. Key Republican Committees that contributed money include: The Republican Committee($2,746,145), Winred ($587,747.99), Rubio Victory Committee ($545,260.09) and Take Back the House Committee ($419,610.11). What surprised me the most was that the Republican Party received $575,397.56 from the state of Florida.
+
+The Republican Party received more money from out-of-state contributions ($8,660,571) than in-state contributions ($5,884,807).
+
+Most of the Republican Party contributions were less than $100 (18,276 contributions). 100+ to 500 were the second most (12,154 contributions). What was interesting though was that they had 990 contributions over a $1,000.
+
+For the Democrats on the other hand, a lot of their donations came from campaigns and other state parties. Val Demings for U.S. Senate ($2,477,000) and Val Demings Victory Fund ($1,537,000) were the top contributors. But you also had states such as Georgia, Iowa and Wisconsin contributing over $200,000 each. The state gave them less than they gave Republicans ($412,254.04). 
+
+
+Democarats like Republicans received more money from out-of-state contributions ($6,343,818) than in-state contributions ($$5,653,056). 
+
+Like the Repblicans, most of the Democrat Party contributions were less than $100 (13,702 contributions). 100+ to 500 were the second most (1,017 contributions). What was interesting from this data was that Democrats received more contributions over $10,000, in terms of amount and number of contributions, than Republicans ($8,535,962.7 and 113 contributions compared to $4,681,851 and 45 contributions). What was also interesting was that although the number of contributions of $100 and less were 13,702 contributions, the total amount contributed was a negative. It was -$328,841.3.
+
+
+
+## Total Republican Contributions 33,319 contributions for $14,545,378	
+```{r}
+rep_contribs_2122 %>% 
+  summarize(amount = sum(contribution_receipt_amount), contributions = n())
+```
+
+## Top Republican Donors are: 1.The Republican National Committee ($2,746,145) 2. WINRED ($587,747.99) 3. State of Florida ($575,397.56) 4. Rubio Victory Committee ($545,260.09) 5. Take Back the House ($419,610.11)
+```{r}
+rep_contribs_2122 %>% 
+  group_by(contributor_name) %>% 
+  summarize(contributions = n(), amount = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(amount))
+```
+
+## Total Republican Out-of-State Donation Amount = $8,660,571
+```{r}
+rep_contribs_2122 %>% 
+  filter(!str_detect(contributor_state, "FL")) %>%
+  summarize(amount = sum(contribution_receipt_amount))
+```
+
+## Total Republican In-State Donation Amount = $5,884,807
+
+```{r}
+rep_contribs_2122 %>% 
+  filter(str_detect(contributor_state, "FL")) %>%
+  summarize(amount = sum(contribution_receipt_amount))
+```
+
+## Number of contributions $100 and less = 1,8276 and 100+ to 500 = 12,154
+```{r}
+rep_contribs_2122 %>% 
+  mutate(
+    amount_group = case_when(
+      contribution_receipt_amount <= 100 ~ 'under_100',
+      contribution_receipt_amount > 100 & contribution_receipt_amount <= 500 ~ '101_500',
+      contribution_receipt_amount > 500 & contribution_receipt_amount <= 1000 ~ '501_1000',
+      contribution_receipt_amount > 1000 & contribution_receipt_amount <= 5000 ~ '1001_5000',
+      contribution_receipt_amount > 5000 & contribution_receipt_amount <= 10000 ~ '5001_10000',
+      contribution_receipt_amount > 10000 ~ '10000_plus'
+    )
+  ) %>%
+  group_by(amount_group) %>%
+  summarise(
+    total = n(),
+    total_amount = sum(contribution_receipt_amount)
+  ) %>%
+  arrange(desc(total))
+```
+
+
+
+## Total Democrat Contributions 15,722 contributions for $11,996,874	
+```{r}
+dem_contribs_2122 %>% 
+  summarize(amount = sum(contribution_receipt_amount), contributions = n())
+```
+
+## Top Democrat Donors are: 1.Valdez Demings for U.S. Senate ($2,477,000) 2. Valdez Demings Victory Fund ($1,537,000) 3. Democratice National Committee/DNC Services Corp ($822,321.49) 4. Democratic Senatorial Campaign Committee ($458,700) 5. Democratic Grassroots Victory Fund ($456,800)
+```{r}
+dem_contribs_2122 %>% 
+  group_by(contributor_name) %>% 
+  summarize(contributions = n(), amount = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(amount))
+```
+
+## Total Democrat Out-of-State Donation Amount = $6,343,818
+```{r}
+dem_contribs_2122 %>% 
+  filter(!str_detect(contributor_state, "FL")) %>%
+  summarize(amount = sum(contribution_receipt_amount))
+```
+
+## Total Democrat In-State Donation Amount = $5,653,056
+
+```{r}
+dem_contribs_2122 %>% 
+  filter(str_detect(contributor_state, "FL")) %>%
+  summarize(amount = sum(contribution_receipt_amount))
+```
+
+## Number of contributions $100 and less = 13,702 and 100+ to 500 = 1,017
+```{r}
+dem_contribs_2122 %>% 
+  mutate(
+    amount_group = case_when(
+      contribution_receipt_amount <= 100 ~ 'under_100',
+      contribution_receipt_amount > 100 & contribution_receipt_amount <= 500 ~ '101_500',
+      contribution_receipt_amount > 500 & contribution_receipt_amount <= 1000 ~ '501_1000',
+      contribution_receipt_amount > 1000 & contribution_receipt_amount <= 5000 ~ '1001_5000',
+      contribution_receipt_amount > 5000 & contribution_receipt_amount <= 10000 ~ '5001_10000',
+      contribution_receipt_amount > 10000 ~ '10000_plus'
+    )
+  ) %>%
+  group_by(amount_group) %>%
+  summarise(
+    total = n(),
+    total_amount = sum(contribution_receipt_amount)
+  ) %>%
+  arrange(desc(total))
+```
+
+
+
+**Q2** What did the party spend its money on? You may need OpenRefine to help you standardize the purpose of spending. Can you tell much about the strategy behind the spending from the data?
+
+**A2** 
+
+```{r}
+
+```
+
+**Q3** When you compare the two parties, where are the differences and similarities?
+
+**A3** 
+ 
+```{r}
+```
+
+**Q4** What about either the donors or the spending that prompts further questions from you?
+
+**A4** 
+ 
+```{r}
+```

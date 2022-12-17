@@ -229,7 +229,29 @@ elrich_18 <- dem_results_18 %>%
 
 blair_elrich_18 <-  bind_rows(blair_18, elrich_18)
 
+blair_22 <- dem_results_22 %>% 
+  filter(candidate_name == "David T. Blair") %>% 
+  group_by(candidate_name, office_name, office_district, winner) %>% 
+  summarize(early_votes = sum(early_votes), election_night_votes = sum(election_night_votes), mail_in_ballot_1_votes = sum(mail_in_ballot_1_votes), provisional_votes = sum(provisional_votes), mail_in_ballot_2_votes = sum(mail_in_ballot_2_votes))
+
+blair_22 <- blair_22 %>% 
+  mutate(total_votes = rowSums(blair_22[, 5:9]))
   
+  
+  
+
+elrich_22 <- dem_results_22 %>%
+  filter(candidate_name == "Marc Elrich") %>% 
+  group_by(candidate_name, office_name, office_district, winner) %>% 
+  summarize(early_votes = sum(early_votes), election_night_votes = sum(election_night_votes), mail_in_ballot_1_votes = sum(mail_in_ballot_1_votes), provisional_votes = sum(provisional_votes), mail_in_ballot_2_votes = sum(mail_in_ballot_2_votes))
+
+elrich_22 <- elrich_22 %>% 
+  mutate(total_votes = rowSums(elrich_22[, 5:9]))
+
+blair_elrich_22 <-  bind_rows(blair_22, elrich_22)
+
+
+
 ```
 
 ### Question 4
@@ -239,7 +261,14 @@ blair_elrich_18 <-  bind_rows(blair_18, elrich_18)
 * **Analysis summary**:   
 
 ```{r}
-dem_precincts_22
+moco_precincts <- st_read("data/election_precincts/election_precincts.shp")
+glimpse(moco_precincts)
+
+  ggplot() +
+  geom_sf(data=moco_boundaries) +
+  geom_sf(data=moco_precincts) +
+  theme_minimal()
+```
 ```
 
 
