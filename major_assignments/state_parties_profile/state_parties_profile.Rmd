@@ -434,4 +434,11 @@ A similarity between the two was that their top contributions were under $100. B
 
 Also Health Insurance was huge gap between the two parties. Democrats spent $437,993.07 while the Republicans only spent $49,353.19	
 
- 
+**Q5** Map the difference 
+
+```{r}
+dem_state_contribs <- dem_contribs_2122 %>%
+  group_by(contributor_state) %>% 
+  summarize(amount = sum(contribution_receipt_amount)) %>% 
+  arrange(desc(amount))
+dem_state_contribs
