@@ -434,7 +434,10 @@ A similarity between the two was that their top contributions were under $100. B
 
 Also Health Insurance was huge gap between the two parties. Democrats spent $437,993.07 while the Republicans only spent $49,353.19	
 
-**Q5** Map the difference 
+**Q5** Map the difference by state in contributions received between the two parties. Create a bar chart displaying Democrats' top expenses. 
+
+**A5** Map: https://datawrapper.dwcdn.net/4NiVK/1/ Bar Chart: https://datawrapper.dwcdn.net/cjwI0/1/
+
 
 ```{r}
 dem_state_contribs <- dem_contribs_2122 %>%
@@ -442,3 +445,44 @@ dem_state_contribs <- dem_contribs_2122 %>%
   summarize(amount = sum(contribution_receipt_amount)) %>% 
   arrange(desc(amount))
 dem_state_contribs
+```
+
+```{r}
+rep_state_contribs <- rep_contribs_2122 %>%
+  group_by(contributor_state) %>% 
+  summarize(amount = sum(contribution_receipt_amount))
+rep_state_contribs
+```
+
+```{r}
+combined_state_contribs <- dem_state_contribs %>% left_join(rep_state_contribs,by="contributor_state") %>% 
+  rename(amount_dem = amount.x) %>% 
+  rename(amount_rep = amount.y) %>% 
+  mutate(amount_diff = amount_dem-amount_rep)
+
+
+
+combined_state_contribs
+
+write_csv(combined_state_contribs, "data/combined_state_contribs.csv")
+
+
+```
+## Florida Election Contribution Difference Map
+
+https://datawrapper.dwcdn.net/4NiVK/1/
+
+
+
+```{r}
+top_dem_expenses <- dem_spending_2122_clean %>% 
+  group_by(disbursement_description) %>% 
+  summarize(amount = sum(disbursement_amount)) %>% 
+  arrange(desc(amount)) %>% 
+  head(10)
+top_dem_expenses
+
+write_csv(top_dem_expenses, "data/top_dem_expenses.csv")
+```
+https://datawrapper.dwcdn.net/cjwI0/1/
+
