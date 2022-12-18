@@ -359,30 +359,79 @@ dem_contribs_2122 %>%
 
 **A2** 
 
+The Florida Republican Party spent $4,485,227 total. The recipient that received the most amount of money from them was Election Connections ($1,276,083.63) and by a wide margin. There isn't information about the company online. But I believe they handle phone election marketing. Conservative Connector, an email marketing firm, was second ($345,431.43). DCE Productions, an event production company, was third ($200,000).
+
+Republicans spent the most on phone ($1,276,882.77), which included phone call and text message fees. But it also included phone marketing and answering voter inquiries as well. The second most amount of money spent by Republicans was payroll ($1,170,702.75). These included staff expenses as well as payroll fees and service charges. 
+
+
+The Democrats spent a lot more money than the Republicans. They spent $7,269,711. The recipient that received the most amount of money from them was Mission Control, a mail marketing firm specializing in campaigns ($1,286,419.73). Unlike the Republicans there isn't a huge gape from the top and the second most expense recipients. The second most was FLORIDA DEMOCRATIC PARTY NON FEDERAL ACCOUNT	($1,041,726.32). There was a huge gap from second and third. Third most was PAYCHEX OF NEW YORK LLC	($591,434.85).
+
+The Democrats spent most of their money on payroll ($2,534,862.26), printing ($1,623,771.19), and contribution reimbursements ($1,593,196.52). Democrats had a non-federal account which they used to reimburse individuals for "excessive contributions." Payroll covered the same expenses as Republicans. Democrats, however had a higher payroll. Printing expenses covered things like campaign gear such as cups, t-shirts, pins, stickers. It'll be worth finding out what is considered "excessive contributions"
+
+## Load Clean Data
 ```{r}
-rep_spending_2122 %>% 
+rep_spending_2122_clean <- read_csv("data/rep_spending_2122_clean.csv")
+dem_spending_2122_clean <- read_csv("data/dem_spending_2122_clean.csv")
+```
+
+## Total Amount of Spending = $4,485,227
+```{r}
+rep_spending_2122_clean %>% 
+  summarize(amount = sum(disbursement_amount))
+```
+
+## Top Spending by far was to Election Connections ($1,276,083.63)
+```{r}
+rep_spending_2122_clean %>% 
   group_by(recipient_name) %>% 
   summarize(amount = sum(disbursement_amount)) %>% 
   arrange(desc(amount))
 ```
+
+## Top Expense Categories was Phone ($1,276,882.77) and Payroll ($1,170,702.75)
 ```{r}
-rep_spending_2122 %>% 
+rep_spending_2122_clean %>% 
+  group_by(disbursement_description) %>% 
+  summarize(amount = sum(disbursement_amount)) %>% 
+  arrange(desc(amount))
+```
+
+
+
+## Democrat Spending total = $7,269,711
+```{r}
+dem_spending_2122_clean %>% 
+  summarize(amount = sum(disbursement_amount))
+```
+## Top Recipients were Mission Control, Inc. and Florida Democratic Party Non Federal Account
+```{r}
+dem_spending_2122_clean %>% 
   group_by(recipient_name) %>% 
   summarize(amount = sum(disbursement_amount)) %>% 
   arrange(desc(amount))
 ```
+#Top Expense Categories Were Payroll, Printing and Reimbursements/Excessive Contributions
+```{r}
+dem_spending_2122_clean %>% 
+  group_by(disbursement_description) %>% 
+  summarize(amount = sum(disbursement_amount)) %>% 
+  arrange(desc(amount))
+```
+
+
 
 **Q3** When you compare the two parties, where are the differences and similarities?
 
-**A3** 
- 
-```{r}
+**A3** I talked about some the differences and similarities in the previous two questions. But another difference between the two parties is that the Republicans got more money from contributions ($14,545,378) and they also did less spending ($4,485,227) as well. Democrats had less money in contributions ($11,996,874) and spent more money ($7,269,711). Democrats net was $4,727,163 while the Republican net was $10,060,151. Republicans spent their money on phone ($1,276,882.77) and email marketing ($747,679.37). While the Democrats spent their money on more creative things like printing for gear and collectibles for voters ($1,623,771.19). Democrats also had a larger payroll than Republicans.
 
-```
+A similarity between the two was that their top contributions were under $100. But Democrats had more big money contributions. The reason for that was Democrat state parties such as Georgia, Iowa, etc. 
+ 
+
 
 **Q4** What about either the donors or the spending that prompts further questions from you?
 
-**A4** 
+**A4** For me, it would be finding out why Democrats were doing reimbursements. They spent so much money on reimbursements because of "excessive contributions." I would love to find out what is considered "excessive contributions" and why do they have that in place. Why are they reimbursing individuals back for excessive contributions? Where individuals requesting it?
+
+Also Health Insurance was huge gap between the two parties. Democrats spent $437,993.07 while the Republicans only spent $49,353.19	
+
  
-```{r}
-```
